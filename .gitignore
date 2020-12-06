@@ -1,1 +1,5 @@
 .idea/
+.ipynb_checkpoints/
+
+data/cologne_000057_000019_leftImg8bit.png
+data/kernal.png
