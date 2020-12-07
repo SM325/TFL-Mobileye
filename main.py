@@ -4,7 +4,10 @@ try:
     import json
     import glob
     import argparse
+<<<<<<< HEAD
     import cv2
+=======
+>>>>>>> 0be6cdc8d54a54cd1cca7aeb47e8e723fb165dd5
 
     print("numpy/scipy imports:")
     import numpy as np
@@ -20,6 +23,8 @@ try:
 except ImportError:
     print("Need to fix the installation")
     raise
+<<<<<<< HEAD
+=======
 
 print("All imports okay. Yay!")
 
@@ -31,6 +36,8 @@ def find_tfl_lights(c_image: np.ndarray, **kwargs):
     :param kwargs: Whatever config you want to pass in here
     :return: 4-tuple of x_red, y_red, x_green, y_green
     """
+    plt.imshow(c_image)
+    plt.show(block=True)
     x = np.arange(-100, 100, 20) + c_image.shape[1] / 2
     y_red = [c_image.shape[0] / 2 - 120] * len(x)
     y_green = [c_image.shape[0] / 2 - 100] * len(x)
@@ -38,8 +45,9 @@ def find_tfl_lights(c_image: np.ndarray, **kwargs):
 
 
 def show_image_and_gt(image, objs, fig_num=None):
-    plt.figure(fig_num).clf()
+    # plt.figure(fig_num).clf()
     plt.imshow(image)
+    plt.subplot()
     labels = set()
     if objs is not None:
         for o in objs:
@@ -65,8 +73,9 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
     show_image_and_gt(image, objects, fig_num)
 
     red_x, red_y, green_x, green_y = find_tfl_lights(image, some_threshold=42)
-    plt.plot(red_x, red_y, 'ro', color='r', markersize=4)
-    plt.plot(green_x, green_y, 'ro', color='g', markersize=4)
+    plt.plot(red_x, red_y, 'r+', color='r', markersize=4)
+    plt.plot(green_x, green_y, 'r+', color='g', markersize=4)
+
 
 
 def main(argv=None):
@@ -79,15 +88,18 @@ def main(argv=None):
     parser.add_argument("-j", "--json", type=str, help="Path to json GT for comparison")
     parser.add_argument('-d', '--dir', type=str, help='Directory to scan images in')
     args = parser.parse_args(argv)
-    default_base = '../../data'
+    default_base = './data'
     if args.dir is None:
         args.dir = default_base
-    flist = glob.glob(os.path.join(args.dir, '*_leftImg8bit.png'))
+    # flist = glob.glob(os.path.join(args.dir, '*_leftImg8bit.png'))
+    flist = glob.glob(os.path.join(args.dir, 'munster_000023_000019_leftImg8bit.png'))
+
     for image in flist:
         json_fn = image.replace('_leftImg8bit.png', '_gtFine_polygons.json')
         if not os.path.exists(json_fn):
             json_fn = None
-        test_find_tfl_lights(image, json_fn)
+        test_find_tfl_lights(image, json_fn,2)
+        # plt.show(block=True)
     if len(flist):
         print("You should now see some images, with the ground truth marked on them. Close all to quit.")
     else:
