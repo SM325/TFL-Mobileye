@@ -34,7 +34,8 @@ def create_kernel():
     filter_kernel = np.hstack([filter_kernel[::], np.fliplr(filter_kernel)])
     filter_kernel = np.vstack([filter_kernel[::], filter_kernel[::-1]])
     filter_kernel = filter_kernel / (filter_kernel.max() - filter_kernel.min())
-    return filter_kernel
+    filter_kernel3 =np.dstack((filter_kernel, filter_kernel, filter_kernel))
+    return filter_kernel3
 
 
 def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
@@ -48,10 +49,11 @@ def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
     # kernel = get_kernel(5)
     kernel = create_kernel()
     c_image = ndimage.gaussian_filter(c_image, sigma=1)
-    after_filter = sg.convolve2d(c_image, kernel, boundary="symm", mode="same")
+    # after_filter = sg.convolve2d(c_image, kernel, boundary="symm", mode="same")
+    after_filter = sg.convolve(c_image, kernel)
     # after_filter = ndimage.convolve(c_image, kernel, mode='constant', cval=0.0)
 
-    fig_ax.imshow(after_filter, cmap="gray")
+    fig_ax.imshow(after_filter)
     fig_ax.set_title('filter')
 
     data_max = maximum_filter(after_filter, 35)
@@ -99,7 +101,7 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
     Run the attention code
     """
     color_image = np.array(Image.open(image_path))
-    image = np.array(Image.open(image_path).convert("L"), dtype=float)
+    image = np.array(Image.open(image_path), dtype=float)
     image /= 255
 
     if json_path is None:
@@ -121,7 +123,7 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
     ax1.imshow(color_image)
     ax1.set_title('original')
 
-    ax2.imshow(image, cmap="gray")
+    ax2.imshow(image)
     ax2.set_title('original after filter')
     ax2.plot(red_x, red_y, 'r+', color='r', markersize=4)
     ax2.plot(green_x, green_y, 'r+', color='r', markersize=4)
