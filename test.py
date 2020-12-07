@@ -13,7 +13,8 @@ from PIL import Image
 
 import matplotlib.pyplot as plt
 
-threshold = 0.4
+
+threshold = 0.5
 
 default_base = './data'
 flist = glob.glob(os.path.join(default_base, '*_leftImg8bit.png'))

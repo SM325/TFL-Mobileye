@@ -1,3 +1,5 @@
+import test_conv
+
 try:
     print("Elementary imports: ")
     import os
@@ -24,19 +26,35 @@ except ImportError:
 print("All imports okay. Yay!")
 
 
-def find_tfl_lights(c_image: np.ndarray, **kwargs):
+def find_tfl_lights(c_image: np.ndarray,fig_ax, **kwargs):
     """
     Detect candidates for TFL lights. Use c_image, kwargs and you imagination to implement
     :param c_image: The image itself as np.uint8, shape of (H, W, 3)
     :param kwargs: Whatever config you want to pass in here
     :return: 4-tuple of x_red, y_red, x_green, y_green
     """
-    plt.imshow(c_image)
-    plt.show(block=True)
-    x = np.arange(-100, 100, 20) + c_image.shape[1] / 2
-    y_red = [c_image.shape[0] / 2 - 120] * len(x)
-    y_green = [c_image.shape[0] / 2 - 100] * len(x)
-    return x, y_red, x, y_green
+    threshold = 0.5
+    kernel = get_kernel(5)
+    ndimage.gaussian_filter(c_image, sigma=5)
+    after_filter = sg.convolve2d(c_image, kernel)
+    data_max = maximum_filter(after_filter, 25)
+    maxima = (after_filter == data_max)
+    after_filter[maxima == False] = 0
+    after_filter[after_filter < threshold] = 0
+
+    slices = np.argwhere(after_filter > 0)
+
+    x, y = [], []
+    for dy, dx in slices:
+        x.append(dx)
+        y.append(dy)
+
+
+    fig_ax.imshow(after_filter, cmap="gray")
+    fig_ax.set_title('after filter')
+
+
+    return x, y, x, y
 
 
 def show_image_and_gt(image, objs, fig_num=None):
@@ -53,11 +71,24 @@ def show_image_and_gt(image, objs, fig_num=None):
             plt.legend()
 
 
+def get_kernel(size):
+    kernel = np.array([[-1, -1, -1, -1, -1],
+                   [-1,  1,  2,  1, -1],
+                   [-1,  2,  4,  2, -1],
+                   [-1,  1,  2,  1, -1],
+                   [-1, -1, -1, -1, -1]], dtype=float)
+
+    kernel = kernel / (kernel.max()-kernel.min())
+    return kernel
+
+
 def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
     """
     Run the attention code
     """
-    image = np.array(Image.open(image_path))
+    image = np.array(Image.open(image_path).convert("L"), dtype=float)
+    image /= 255
+
     if json_path is None:
         objects = None
     else:
@@ -65,13 +96,21 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
         what = ['traffic light']
         objects = [o for o in gt_data['objects'] if o['label'] in what]
 
-    show_image_and_gt(image, objects, fig_num)
+    # show_image_and_gt(image, objects, fig_num)
+    plt.figure()
+    ax1 = plt.subplot(221)
+    ax2 = plt.subplot(222, sharex=ax1, sharey=ax1)
+    ax3 = plt.subplot(223, sharex=ax1, sharey=ax1)
 
-    red_x, red_y, green_x, green_y = find_tfl_lights(image, some_threshold=42)
-    plt.plot(red_x, red_y, 'r+', color='r', markersize=4)
-    plt.plot(green_x, green_y, 'r+', color='g', markersize=4)
+    red_x, red_y, green_x, green_y = find_tfl_lights(image, ax3, some_threshold=42)
 
+    ax1.imshow(image, cmap="gray")
+    ax1.set_title('original')
 
+    ax2.imshow(image, cmap="gray")
+    ax2.set_title('original after filter')
+    ax2.plot(red_x, red_y, 'r+', color='r', markersize=4)
+    ax2.plot(green_x, green_y, 'r+', color='r', markersize=4)
 
 def main(argv=None):
     """It's nice to have a standalone tester for the algorithm.
@@ -86,14 +125,16 @@ def main(argv=None):
     default_base = './data'
     if args.dir is None:
         args.dir = default_base
-    # flist = glob.glob(os.path.join(args.dir, '*_leftImg8bit.png'))
-    flist = glob.glob(os.path.join(args.dir, 'munster_000023_000019_leftImg8bit.png'))
+    flist = glob.glob(os.path.join(args.dir, '*_leftImg8bit.png'))
+    # flist = glob.glob(os.path.join(args.dir, 'munster_000023_000019_leftImg8bit.png'))
 
     for image in flist:
         json_fn = image.replace('_leftImg8bit.png', '_gtFine_polygons.json')
         if not os.path.exists(json_fn):
             json_fn = None
-        test_find_tfl_lights(image, json_fn,2)
+
+        test_find_tfl_lights(image, json_fn)
+
         # plt.show(block=True)
     if len(flist):
         print("You should now see some images, with the ground truth marked on them. Close all to quit.")
@@ -103,4 +144,5 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
+    #test_conv.test_conv()
     main()
