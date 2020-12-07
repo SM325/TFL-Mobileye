@@ -13,7 +13,7 @@ from PIL import Image
 
 import matplotlib.pyplot as plt
 
-threshold = 0.6
+threshold = 0.4
 
 default_base = './data'
 flist = glob.glob(os.path.join(default_base, '*_leftImg8bit.png'))
@@ -37,7 +37,7 @@ for image in flist:
                    [-1,  1,  2,  1, -1],
                    [-1, -1, -1, -1, -1]], dtype=float)
 
-    # kernel =kernel/ (4- (-1))
+    kernel =kernel/ (4- (-1))
     #
     # k = np.array([[118, 122, 121, 121, 117, 117, 122, 126, 124, 130, 130, 125, 133, 136, 145, 170, 191],
     #             [92, 93, 93, 93, 94, 95, 97, 100, 105, 117, 124, 125, 127, 126, 145, 191, 215],
@@ -119,6 +119,6 @@ for image in flist:
     ax2.imshow(after_filter)
     ax2.set_title('after filter')
 
-    plt.show()
+plt.show()
 
 #np.argwhere

@@ -4,10 +4,7 @@ try:
     import json
     import glob
     import argparse
-<<<<<<< HEAD
-    import cv2
-=======
->>>>>>> 0be6cdc8d54a54cd1cca7aeb47e8e723fb165dd5
+
 
     print("numpy/scipy imports:")
     import numpy as np
@@ -23,8 +20,6 @@ try:
 except ImportError:
     print("Need to fix the installation")
     raise
-<<<<<<< HEAD
-=======
 
 print("All imports okay. Yay!")
 
