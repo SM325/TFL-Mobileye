@@ -30,7 +30,8 @@ def find_tfl_lights(c_image: np.ndarray, **kwargs):
     :param kwargs: Whatever config you want to pass in here
     :return: 4-tuple of x_red, y_red, x_green, y_green
     """
-
+    plt.imshow(c_image)
+    plt.show(block=True)
     x = np.arange(-100, 100, 20) + c_image.shape[1] / 2
     y_red = [c_image.shape[0] / 2 - 120] * len(x)
     y_green = [c_image.shape[0] / 2 - 100] * len(x)
@@ -38,8 +39,9 @@ def find_tfl_lights(c_image: np.ndarray, **kwargs):
 
 
 def show_image_and_gt(image, objs, fig_num=None):
-    plt.figure(fig_num).clf()
+    # plt.figure(fig_num).clf()
     plt.imshow(image)
+    plt.subplot()
     labels = set()
     if objs is not None:
         for o in objs:
@@ -69,6 +71,7 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
     plt.plot(green_x, green_y, 'r+', color='g', markersize=4)
 
 
+
 def main(argv=None):
     """It's nice to have a standalone tester for the algorithm.
     Consider looping over some images from here, so you can manually exmine the results
@@ -89,7 +92,7 @@ def main(argv=None):
         json_fn = image.replace('_leftImg8bit.png', '_gtFine_polygons.json')
         if not os.path.exists(json_fn):
             json_fn = None
-        test_find_tfl_lights(image, json_fn,1)
+        test_find_tfl_lights(image, json_fn,2)
         # plt.show(block=True)
     if len(flist):
         print("You should now see some images, with the ground truth marked on them. Close all to quit.")
