@@ -25,7 +25,7 @@ except ImportError:
 print("All imports okay. Yay!")
 
 
-def create_kernel():
+def create_kernel10():
     filter_kernel = np.array([[-3.5, -2.25, -2, -2, -2],
                               [-2.25, -1, 1 / 4, 1 / 2, 1],
                               [-2, 1 / 4, 1, 1, 1.25],
@@ -38,6 +38,16 @@ def create_kernel():
     return filter_kernel
 
 
+def create_kernel5():
+    kernel = np.array([[-1, -1, -1, -1, -1],
+                       [-1, 1, 2, 1, -1],
+                       [-1, 2, 4, 2, -1],
+                       [-1, 1, 2, 1, -1],
+                       [-1, -1, -1, -1, -1]], dtype=float)
+
+    kernel = kernel / (kernel.max() - kernel.min())
+    return kernel
+
 
 def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
     """
@@ -46,13 +56,14 @@ def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
     :param kwargs: Whatever config you want to pass in here
     :return: 4-tuple of x_red, y_red, x_green, y_green
     """
-    threshold = 2.5
-    # kernel = get_kernel(5)
-    kernel = create_kernel()
+    threshold = 2.2
     c_image = ndimage.gaussian_filter(c_image, sigma=1)
-    # after_filter = sg.convolve2d(c_image, kernel, boundary="symm", mode="same")
-    after_filter = sg.convolve(c_image, kernel)
-    # after_filter = ndimage.convolve(c_image, kernel, mode='constant', cval=0.0)
+
+    kernel = create_kernel10()
+    after_filter = sg.convolve2d(c_image, kernel, boundary="symm", mode="same")
+
+    kernel = create_kernel5()
+    after_filter = sg.convolve2d(after_filter, kernel, boundary="symm", mode="same")
 
     fig_ax.imshow(after_filter)
     fig_ax.set_title('filter')
@@ -71,7 +82,7 @@ def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
     for dy, dx in slices:
         x.append(dx)
         y.append(dy)
-    # print(len(x))
+    print(len(x))
     return x, y
 
 
@@ -89,23 +100,12 @@ def show_image_and_gt(image, objs, fig_num=None):
             plt.legend()
 
 
-def get_kernel(size):
-    kernel = np.array([[-1, -1, -1, -1, -1],
-                       [-1, 1, 2, 1, -1],
-                       [-1, 2, 4, 2, -1],
-                       [-1, 1, 2, 1, -1],
-                       [-1, -1, -1, -1, -1]], dtype=float)
-
-    kernel = kernel / (kernel.max() - kernel.min())
-    return kernel
-
-
 def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
     """
     Run the attention code
     """
     color_image = np.array(Image.open(image_path))
-    image = np.array(Image.open(image_path), dtype=float)
+    image = np.array(Image.open(image_path).convert("L"), dtype=float)
     image /= 255
 
     if json_path is None:
@@ -115,7 +115,6 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
         what = ['traffic light']
         objects = [o for o in gt_data['objects'] if o['label'] in what]
 
-
     # show_image_and_gt(image, objects, fig_num)
     plt.figure()
     ax1 = plt.subplot(221)
@@ -124,7 +123,6 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
 
     ax1.imshow(color_image)
     ax1.set_title('original')
-
 
     ax2.imshow(color_image)
     ax2.set_title('original after filter')
@@ -137,10 +135,9 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
         red_val = color_image[y, x, 0]
         green_val = color_image[y, x, 1]
         if red_val >= green_val:
-            ax2.plot(x, y, 'r+', color='r', markersize=4)
+            ax2.plot(x, y, 'r*', color='r', markersize=5)
         else:
-            ax2.plot(x, y, 'b+', color='b', markersize=4)
-
+            ax2.plot(x, y, 'g*', color='g', markersize=5)
 
     # ax2.plot(red_x, red_y, 'r+', color='r', markersize=4)
     # ax2.plot(green_x, green_y, 'b+', color='b', markersize=4)
