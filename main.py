@@ -34,6 +34,7 @@ def create_kernel():
     filter_kernel = np.hstack([filter_kernel[::], np.fliplr(filter_kernel)])
     filter_kernel = np.vstack([filter_kernel[::], filter_kernel[::-1]])
     filter_kernel = filter_kernel / (filter_kernel.max() - filter_kernel.min())
+    filter_kernel_3m = np.array([filter_kernel, filter_kernel, filter_kernel])
     return filter_kernel
 
 
@@ -61,12 +62,15 @@ def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
 
     slices = np.argwhere(after_filter > 0)
 
+    # red_x, red_y, green_x, green_y = [], [], [], []
+
     x, y = [], []
+
     for dy, dx in slices:
         x.append(dx)
         y.append(dy)
-    print(len(x))
-    return x, y, x, y
+    # print(len(x))
+    return x, y
 
 
 def show_image_and_gt(image, objs, fig_num=None):
@@ -116,15 +120,27 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
     ax2 = plt.subplot(222, sharex=ax1, sharey=ax1)
     ax3 = plt.subplot(223, sharex=ax1, sharey=ax1)
 
-    red_x, red_y, green_x, green_y = find_tfl_lights(image, ax3, some_threshold=42)
-
     ax1.imshow(color_image)
     ax1.set_title('original')
 
-    ax2.imshow(image, cmap="gray")
+    ax2.imshow(color_image)
     ax2.set_title('original after filter')
-    ax2.plot(red_x, red_y, 'r+', color='r', markersize=4)
-    ax2.plot(green_x, green_y, 'r+', color='r', markersize=4)
+
+    x, y = find_tfl_lights(image, ax3, some_threshold=42)
+
+    cord = zip(x, y)
+
+    for x, y in cord:
+        red_val = color_image[y, x, 0]
+        green_val = color_image[y, x, 1]
+        if red_val >= green_val:
+            ax2.plot(x, y, 'r+', color='r', markersize=4)
+        else:
+            ax2.plot(x, y, 'b+', color='b', markersize=4)
+
+
+    # ax2.plot(red_x, red_y, 'r+', color='r', markersize=4)
+    # ax2.plot(green_x, green_y, 'b+', color='b', markersize=4)
 
 
 def main(argv=None):
