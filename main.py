@@ -7,12 +7,11 @@ try:
     import glob
     import argparse
 
-
     print("numpy/scipy imports:")
     import numpy as np
     from scipy import signal as sg
     import scipy.ndimage as ndimage
-    from scipy.ndimage.filters import maximum_filter
+    from scipy.ndimage.filters import maximum_filter, minimum_filter
 
     print("PIL imports:")
     from PIL import Image
@@ -26,17 +25,35 @@ except ImportError:
 print("All imports okay. Yay!")
 
 
-def find_tfl_lights(c_image: np.ndarray,fig_ax, **kwargs):
+def create_kernel():
+    filter_kernel = np.array([[-3.5, -2.25, -2, -2, -2],
+                              [-2.25, -1, 1 / 4, 1 / 2, 1],
+                              [-2, 1 / 4, 1, 1, 1.25],
+                              [-2, 1 / 2, 1, 2, 3],
+                              [-2, 1, 1.25, 3, 4]])
+    filter_kernel = np.hstack([filter_kernel[::], np.fliplr(filter_kernel)])
+    filter_kernel = np.vstack([filter_kernel[::], filter_kernel[::-1]])
+    filter_kernel = filter_kernel / (filter_kernel.max() - filter_kernel.min())
+    return filter_kernel
+
+
+def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
     """
     Detect candidates for TFL lights. Use c_image, kwargs and you imagination to implement
     :param c_image: The image itself as np.uint8, shape of (H, W, 3)
     :param kwargs: Whatever config you want to pass in here
     :return: 4-tuple of x_red, y_red, x_green, y_green
     """
-    threshold = 0.5
-    kernel = get_kernel(5)
-    ndimage.gaussian_filter(c_image, sigma=5)
-    after_filter = sg.convolve2d(c_image, kernel)
+    threshold = 3.0
+    # kernel = get_kernel(5)
+    kernel = create_kernel()
+    # ndimage.gaussian_filter(c_image, sigma=5)
+    after_filter = sg.convolve2d(c_image, kernel, boundary="symm", mode="same")
+    # after_filter = ndimage.convolve(c_image, kernel, mode='constant', cval=0.0)
+
+    fig_ax.imshow(after_filter, cmap="gray")
+    fig_ax.set_title('after filter')
+
     data_max = maximum_filter(after_filter, 25)
     maxima = (after_filter == data_max)
     after_filter[maxima == False] = 0
@@ -48,10 +65,6 @@ def find_tfl_lights(c_image: np.ndarray,fig_ax, **kwargs):
     for dy, dx in slices:
         x.append(dx)
         y.append(dy)
-
-
-    fig_ax.imshow(after_filter, cmap="gray")
-    fig_ax.set_title('after filter')
 
 
     return x, y, x, y
@@ -73,12 +86,12 @@ def show_image_and_gt(image, objs, fig_num=None):
 
 def get_kernel(size):
     kernel = np.array([[-1, -1, -1, -1, -1],
-                   [-1,  1,  2,  1, -1],
-                   [-1,  2,  4,  2, -1],
-                   [-1,  1,  2,  1, -1],
-                   [-1, -1, -1, -1, -1]], dtype=float)
+                       [-1, 1, 2, 1, -1],
+                       [-1, 2, 4, 2, -1],
+                       [-1, 1, 2, 1, -1],
+                       [-1, -1, -1, -1, -1]], dtype=float)
 
-    kernel = kernel / (kernel.max()-kernel.min())
+    kernel = kernel / (kernel.max() - kernel.min())
     return kernel
 
 
@@ -112,6 +125,7 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
     ax2.plot(red_x, red_y, 'r+', color='r', markersize=4)
     ax2.plot(green_x, green_y, 'r+', color='r', markersize=4)
 
+
 def main(argv=None):
     """It's nice to have a standalone tester for the algorithm.
     Consider looping over some images from here, so you can manually exmine the results
@@ -134,6 +148,7 @@ def main(argv=None):
             json_fn = None
 
         test_find_tfl_lights(image, json_fn)
+        plt.show(block=True)
 
         # plt.show(block=True)
     if len(flist):
@@ -144,5 +159,5 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    #test_conv.test_conv()
+    # test_conv.test_conv()
     main()
