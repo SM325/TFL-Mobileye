@@ -44,17 +44,17 @@ def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
     :param kwargs: Whatever config you want to pass in here
     :return: 4-tuple of x_red, y_red, x_green, y_green
     """
-    threshold = 3.0
+    threshold = 2.5
     # kernel = get_kernel(5)
     kernel = create_kernel()
-    # ndimage.gaussian_filter(c_image, sigma=5)
+    c_image = ndimage.gaussian_filter(c_image, sigma=1)
     after_filter = sg.convolve2d(c_image, kernel, boundary="symm", mode="same")
     # after_filter = ndimage.convolve(c_image, kernel, mode='constant', cval=0.0)
 
     fig_ax.imshow(after_filter, cmap="gray")
-    fig_ax.set_title('after filter')
+    fig_ax.set_title('filter')
 
-    data_max = maximum_filter(after_filter, 25)
+    data_max = maximum_filter(after_filter, 35)
     maxima = (after_filter == data_max)
     after_filter[maxima == False] = 0
     after_filter[after_filter < threshold] = 0
@@ -65,8 +65,7 @@ def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
     for dy, dx in slices:
         x.append(dx)
         y.append(dy)
-
-
+    print(len(x))
     return x, y, x, y
 
 
@@ -99,6 +98,7 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
     """
     Run the attention code
     """
+    color_image = np.array(Image.open(image_path))
     image = np.array(Image.open(image_path).convert("L"), dtype=float)
     image /= 255
 
@@ -109,6 +109,7 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
         what = ['traffic light']
         objects = [o for o in gt_data['objects'] if o['label'] in what]
 
+
     # show_image_and_gt(image, objects, fig_num)
     plt.figure()
     ax1 = plt.subplot(221)
@@ -117,7 +118,7 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
 
     red_x, red_y, green_x, green_y = find_tfl_lights(image, ax3, some_threshold=42)
 
-    ax1.imshow(image, cmap="gray")
+    ax1.imshow(color_image)
     ax1.set_title('original')
 
     ax2.imshow(image, cmap="gray")
