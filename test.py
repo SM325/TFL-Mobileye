@@ -13,6 +13,8 @@ from PIL import Image
 
 import matplotlib.pyplot as plt
 
+threshold = 0.6
+
 default_base = './data'
 flist = glob.glob(os.path.join(default_base, '*_leftImg8bit.png'))
 for image in flist:
@@ -35,8 +37,8 @@ for image in flist:
                    [-1,  1,  2,  1, -1],
                    [-1, -1, -1, -1, -1]], dtype=float)
 
-    kernel =kernel/ (4- (-1))
-
+    # kernel =kernel/ (4- (-1))
+    #
     # k = np.array([[118, 122, 121, 121, 117, 117, 122, 126, 124, 130, 130, 125, 133, 136, 145, 170, 191],
     #             [92, 93, 93, 93, 94, 95, 97, 100, 105, 117, 124, 125, 127, 126, 145, 191, 215],
     #             [80, 79, 85, 99, 101, 108, 121, 125, 127, 130, 129, 126, 124, 123, 137, 184, 212],
@@ -73,26 +75,44 @@ for image in flist:
     # k = np.flipud(k)
     # k = np.fliplr(k)
     # k = k / 255
-
+    #
+    # filter_kernel = np.array([[-3.5, -2.25, -2, -2, -2],
+    #                           [-2.25, -1, 1 / 4, 1 / 2, 1],
+    #                           [-2, 1 / 4, 1, 1, 1.25],
+    #                           [-2, 1 / 2, 1, 2, 3],
+    #                           [-2, 1, 1.25, 3, 4]])
+    # filter_kernel = np.hstack([filter_kernel[::], np.fliplr(filter_kernel)])
+    # filter_kernel = np.vstack([filter_kernel[::], filter_kernel[::-1]])
+    # filter_kernel = filter_kernel / 7.5
 
     after_filter = sg.convolve2d(original_image, kernel)
 
-    data_max = maximum_filter(after_filter, 5)
+    data_max = maximum_filter(after_filter, 10)
     maxima = (after_filter == data_max)
-    data_min = minimum_filter(after_filter, 5)
-    diff = ((data_max - data_min) > 0.5)
-    maxima[diff == 0] = 0
+    # data_min = minimum_filter(after_filter, 10)
+    # diff = ((data_max - data_min) > 0.6)
+    # maxima[diff == 0] = 0
 
-    # after_filter[maxima == False] = 0
+    after_filter[maxima == False] = 0
+    after_filter[after_filter < threshold] = 0
 
-    labeled, num_objects = ndimage.label(maxima)
-    slices = ndimage.find_objects(labeled)
+    slices = np.argwhere(after_filter > 0)
+
+
+    #
+    # labeled, num_objects = ndimage.label(maxima)
+    # slices = ndimage.find_objects(labeled)
+    # x, y = [], []
+    # for dy, dx in slices:
+    #     x_center = (dx.start + dx.stop - 1) / 2
+    #     x.append(x_center)
+    #     y_center = (dy.start + dy.stop - 1) / 2
+    #     y.append(y_center)
+
     x, y = [], []
     for dy, dx in slices:
-        x_center = (dx.start + dx.stop - 1) / 2
-        x.append(x_center)
-        y_center = (dy.start + dy.stop - 1) / 2
-        y.append(y_center)
+        x.append(dx)
+        y.append(dy)
 
     ax1.plot(x, y, 'r+', color='r', markersize=4)
 
