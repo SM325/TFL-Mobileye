@@ -25,6 +25,43 @@ except ImportError:
 print("All imports okay. Yay!")
 
 
+def create_kernel21():
+    kernel = np.array([[56, 50, 46, 43, 41, 41, 40, 39, 38, 38, 39, 40, 40, 38, 38, 37, 37, 36, 39, 51, 59, 63],
+                       [56, 50, 42, 38, 38, 37, 36, 38, 40, 44, 47, 49, 47, 43, 40, 37, 35, 35, 38, 50, 61, 66],
+                       [55, 45, 37, 34, 32, 29, 46, 58, 71, 81, 79, 80, 85, 87, 83, 63, 46, 38, 33, 49, 62, 67],
+                       [55, 45, 36, 39, 37, 58, 84, 103, 113, 128, 144, 145, 137, 129, 111, 96, 84, 68, 50, 50, 64, 69],
+                       [56, 47, 35, 36, 62, 87, 100, 112, 129, 145, 165, 182, 188, 180, 171, 140, 110, 104, 73, 56, 66,
+                        71],
+                       [58, 48, 38, 64, 91, 119, 125, 150, 170, 194, 211, 218, 222, 220, 216, 177, 123, 113, 104, 78,
+                        66, 71],
+                       [61, 50, 52, 90, 112, 137, 150, 210, 225, 222, 231, 239, 242, 241, 231, 204, 155, 121, 116, 97,
+                        73, 70],
+                       [62, 52, 78, 108, 128, 146, 181, 223, 223, 223, 234, 239, 240, 240, 226, 212, 180, 137, 116, 107,
+                        83, 69],
+                       [62, 53, 98, 117, 136, 154, 202, 226, 226, 214, 227, 232, 234, 236, 219, 211, 191, 144, 115, 113,
+                        89, 68],
+                       [62, 53, 97, 116, 141, 163, 211, 226, 220, 207, 201, 216, 236, 238, 219, 210, 192, 146, 115, 117,
+                        90, 60],
+                       [62, 53, 99, 117, 137, 169, 212, 223, 205, 189, 206, 218, 241, 242, 221, 210, 189, 143, 115, 116,
+                        86, 52],
+                       [63, 53, 95, 116, 130, 166, 203, 219, 222, 220, 231, 233, 244, 241, 216, 207, 181, 134, 115, 109,
+                        77, 48],
+                       [64, 53, 79, 109, 131, 166, 197, 207, 228, 229, 236, 239, 241, 227, 206, 213, 168, 119, 118, 98,
+                        62, 48],
+                       [65, 53, 57, 96, 124, 152, 186, 208, 224, 225, 224, 227, 225, 213, 210, 205, 150, 110, 111, 78,
+                        52, 53],
+                       [65, 53, 36, 60, 102, 120, 155, 170, 216, 226, 220, 199, 194, 189, 184, 159, 113, 103, 81, 52,
+                        52, 57],
+                       [68, 54, 36, 46, 64, 94, 118, 124, 149, 186, 198, 181, 155, 143, 135, 116, 90, 80, 53, 42, 54,
+                        60],
+                       [76, 62, 43, 40, 41, 58, 87, 102, 113, 122, 137, 133, 119, 113, 106, 86, 65, 52, 45, 48, 62, 73],
+                       [93, 70, 48, 42, 39, 37, 51, 59, 71, 69, 71, 70, 72, 72, 66, 49, 41, 41, 39, 61, 83, 97],
+                       [105, 80, 66, 57, 50, 46, 42, 41, 42, 44, 47, 48, 46, 45, 47, 50, 53, 57, 71, 90, 106, 113]],
+                      dtype=float)
+    kernel = kernel / (kernel.max() - kernel.min())
+    return kernel
+
+
 def create_kernel10():
     filter_kernel = np.array([[-3.5, -2.25, -2, -2, -2],
                               [-2.25, -1, 1 / 4, 1 / 2, 1],
@@ -34,7 +71,6 @@ def create_kernel10():
     filter_kernel = np.hstack([filter_kernel[::], np.fliplr(filter_kernel)])
     filter_kernel = np.vstack([filter_kernel[::], filter_kernel[::-1]])
     filter_kernel = filter_kernel / (filter_kernel.max() - filter_kernel.min())
-    filter_kernel_3m = np.array([filter_kernel, filter_kernel, filter_kernel])
     return filter_kernel
 
 
@@ -44,7 +80,14 @@ def create_kernel5():
                        [-1, 2, 4, 2, -1],
                        [-1, 1, 2, 1, -1],
                        [-1, -1, -1, -1, -1]], dtype=float)
+    kernel = kernel / (kernel.max() - kernel.min())
+    return kernel
 
+
+def create_kernel3():
+    kernel = np.array([[-1 / 9, -1 / 9, -1 / 9],
+                       [-1 / 9, 8 / 9, -1 / 9],
+                       [-1 / 9, -1 / 9, -1 / 9]], dtype=float)
     kernel = kernel / (kernel.max() - kernel.min())
     return kernel
 
@@ -56,14 +99,40 @@ def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
     :param kwargs: Whatever config you want to pass in here
     :return: 4-tuple of x_red, y_red, x_green, y_green
     """
-    threshold = 2.2
+    threshold = 0.25
     c_image = ndimage.gaussian_filter(c_image, sigma=1)
 
-    kernel = create_kernel10()
-    after_filter = sg.convolve2d(c_image, kernel, boundary="symm", mode="same")
+    after_filter = c_image
+    kernels = [create_kernel3(), create_kernel5(), create_kernel10(), create_kernel21()]
+    kernels = [create_kernel5(), create_kernel10()]
 
-    kernel = create_kernel5()
-    after_filter = sg.convolve2d(after_filter, kernel, boundary="symm", mode="same")
+
+    for kernel in kernels:
+        after_filter = sg.convolve2d(c_image, kernel, boundary="symm", mode="same")
+        after_filter = after_filter / (after_filter.max() - after_filter.min())
+
+    # kernel = create_kernel3()
+    # after_filter = sg.convolve2d(c_image, kernel, boundary="symm", mode="same")
+    #
+    # after_filter = after_filter / (after_filter.max() - after_filter.min())
+    #
+    #
+    # kernel = create_kernel5()
+    # after_filter = sg.convolve2d(after_filter, kernel, boundary="symm", mode="same")
+    #
+    # after_filter = after_filter / (after_filter.max() - after_filter.min())
+    #
+    # kernel = create_kernel10()
+    # after_filter = sg.convolve2d(after_filter, kernel, boundary="symm", mode="same")
+    #
+    # after_filter = after_filter / (after_filter.max() - after_filter.min())
+    #
+    #
+    #
+    # kernel = create_kernel21()
+    # after_filter = sg.convolve2d(after_filter, kernel, boundary="symm", mode="same")
+    #
+    # after_filter = after_filter / (after_filter.max() - after_filter.min())
 
     fig_ax.imshow(after_filter)
     fig_ax.set_title('filter')
@@ -135,9 +204,9 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
         red_val = color_image[y, x, 0]
         green_val = color_image[y, x, 1]
         if red_val >= green_val:
-            ax2.plot(x, y, 'r*', color='r', markersize=5)
+            ax2.plot(x, y, 'r+', color='r', markersize=5)
         else:
-            ax2.plot(x, y, 'g*', color='g', markersize=5)
+            ax2.plot(x, y, 'b+', color='b', markersize=7)
 
     # ax2.plot(red_x, red_y, 'r+', color='r', markersize=4)
     # ax2.plot(green_x, green_y, 'b+', color='b', markersize=4)
@@ -167,7 +236,6 @@ def main(argv=None):
         test_find_tfl_lights(image, json_fn)
         plt.show(block=True)
 
-        # plt.show(block=True)
     if len(flist):
         print("You should now see some images, with the ground truth marked on them. Close all to quit.")
     else:
