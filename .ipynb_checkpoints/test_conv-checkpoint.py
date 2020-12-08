@@ -27,7 +27,7 @@ def show_image(image, fig_num=None):
     plt.show(block=True)
 
 def test_conv():
-    url = './data\\cologne_000057_000019_leftImg8bit.png'
+    url = './data1\\cologne_000057_000019_leftImg8bit.png'
     image = np.array(Image.open(url).convert("L"))
 
     k = np.array([[-1/9, -1/9, -1/9],
