@@ -3,5 +3,3 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 *.ipynb
-data/cologne_000057_000019_leftImg8bit.png
-data/kernal.png
