@@ -1,5 +1,3 @@
-import test_conv
-
 try:
     print("Elementary imports: ")
     import os
@@ -82,6 +80,7 @@ def create_kernel25():
     kernel = kernel / (kernel.max() - kernel.min())
     return kernel
 
+
 def create_kernel21():
     kernel = np.array([[56, 50, 46, 43, 41, 41, 40, 39, 38, 38, 39, 40, 40, 38, 38, 37, 37, 36, 39, 51, 59, 63],
                        [56, 50, 42, 38, 38, 37, 36, 38, 40, 44, 47, 49, 47, 43, 40, 37, 35, 35, 38, 50, 61, 66],
@@ -119,6 +118,7 @@ def create_kernel21():
     kernel = kernel / (kernel.max() - kernel.min())
     return kernel
 
+
 def create_kernel10():
     filter_kernel = np.array([[-3.5, -2.25, -2, -2, -2],
                               [-2.25, -1, 1 / 4, 1 / 2, 1],
@@ -130,12 +130,14 @@ def create_kernel10():
     filter_kernel = filter_kernel / (filter_kernel.max() - filter_kernel.min())
     return filter_kernel
 
+
 def create_kernel5():
     kernel = np.array([[-1, -1, -1, -1, -1],
                        [-1, 1, 2, 1, -1],
                        [-1, 2, 4, 2, -1],
                        [-1, 1, 2, 1, -1],
                        [-1, -1, -1, -1, -1]], dtype=float)
+    kernel = kernel - (kernel.mean())
     kernel = kernel / (kernel.max() - kernel.min())
     return kernel
 
@@ -158,8 +160,8 @@ def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
     c_image = ndimage.gaussian_filter(c_image, sigma=1)
 
     after_filter = c_image
-    kernels = [create_kernel3(), create_kernel5(), create_kernel10(), create_kernel21(), create_kernel25()]
-    kernels = [create_kernel10(), create_kernel21()]
+    # kernels = [create_kernel3(), create_kernel5(), create_kernel10(), create_kernel21(), create_kernel25()]
+    kernels = [create_kernel10()]
 
     for kernel in kernels:
         after_filter = sg.convolve2d(after_filter, kernel, boundary="symm", mode="same")
