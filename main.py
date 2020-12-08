@@ -25,7 +25,7 @@ except ImportError:
 print("All imports okay. Yay!")
 
 
-def create_kernel():
+def create_kernel10():
     filter_kernel = np.array([[-3.5, -2.25, -2, -2, -2],
                               [-2.25, -1, 1 / 4, 1 / 2, 1],
                               [-2, 1 / 4, 1, 1, 1.25],
@@ -38,6 +38,37 @@ def create_kernel():
     return filter_kernel
 
 
+def create_kernel10():
+    filter_kernel = np.array([[-3.5, -2.25, -2, -2, -2],
+                              [-2.25, -1, 1 / 4, 1 / 2, 1],
+                              [-2, 1 / 4, 1, 1, 1.25],
+                              [-2, 1 / 2, 1, 2, 3],
+                              [-2, 1, 1.25, 3, 4]], dtype=float)
+    filter_kernel = np.hstack([filter_kernel[::], np.fliplr(filter_kernel)])
+    filter_kernel = np.vstack([filter_kernel[::], filter_kernel[::-1]])
+    filter_kernel = filter_kernel / (filter_kernel.max() - filter_kernel.min())
+    return filter_kernel
+
+
+def create_kernel5():
+    kernel = np.array([[-1, -1, -1, -1, -1],
+                       [-1, 1, 2, 1, -1],
+                       [-1, 2, 4, 2, -1],
+                       [-1, 1, 2, 1, -1],
+                       [-1, -1, -1, -1, -1]], dtype=float)
+
+    kernel = kernel / (kernel.max() - kernel.min())
+    return kernel
+
+
+def create_kernel3():
+    kernel = np.array([[-1/9, -1/9, -1/9],
+                       [-1/9, 8/9, -1/9],
+                       [-1/9, -1/9, -1/9]], dtype=float)
+
+    kernel = kernel / (kernel.max() - kernel.min())
+    return kernel
+
 def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
     """
     Detect candidates for TFL lights. Use c_image, kwargs and you imagination to implement
@@ -47,9 +78,13 @@ def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
     """
     threshold = 2.5
     # kernel = get_kernel(5)
-    kernel = create_kernel()
+    # kernel_arr = [create_kernel3(), create_kernel5(), create_kernel10()]
+    kernel_arr = [create_kernel10()]
     c_image = ndimage.gaussian_filter(c_image, sigma=1)
-    after_filter = sg.convolve2d(c_image, kernel, boundary="symm", mode="same")
+    after_filter = c_image
+
+    for kernel in kernel_arr:
+        after_filter = sg.convolve2d(after_filter, kernel, boundary="symm", mode="same")
     # after_filter = ndimage.convolve(c_image, kernel, mode='constant', cval=0.0)
 
     fig_ax.imshow(after_filter, cmap="gray")
@@ -69,7 +104,7 @@ def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
     for dy, dx in slices:
         x.append(dx)
         y.append(dy)
-    # print(len(x))
+    print(len(x))
     return x, y
 
 
@@ -85,17 +120,6 @@ def show_image_and_gt(image, objs, fig_num=None):
             labels.add(o['label'])
         if len(labels) > 1:
             plt.legend()
-
-
-def get_kernel(size):
-    kernel = np.array([[-1, -1, -1, -1, -1],
-                       [-1, 1, 2, 1, -1],
-                       [-1, 2, 4, 2, -1],
-                       [-1, 1, 2, 1, -1],
-                       [-1, -1, -1, -1, -1]], dtype=float)
-
-    kernel = kernel / (kernel.max() - kernel.min())
-    return kernel
 
 
 def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
