@@ -1,5 +1,3 @@
-import test_conv
-
 try:
     print("Elementary imports: ")
     import os
@@ -120,6 +118,7 @@ def create_kernel21():
     kernel = kernel / (kernel.max() - kernel.min())
     return kernel
 
+
 def create_kernel10():
     filter_kernel = np.array([[-3.5, -2.25, -2, -2, -2],
                               [-2.25, -1, 1 / 4, 1 / 2, 1],
@@ -130,6 +129,23 @@ def create_kernel10():
     filter_kernel = np.vstack([filter_kernel[::], filter_kernel[::-1]])
     filter_kernel = filter_kernel / (filter_kernel.max() - filter_kernel.min())
     return filter_kernel
+
+
+def create_kernel7():
+    kernel = np.array([[71., 50., 62., 67., 70., 63., 78.],
+                       [89., 124., 134., 145., 147., 102., 91.],
+                       [125., 137., 174., 177., 178., 141., 138.],
+                       [116., 142., 198., 189., 190., 135., 129.],
+                       [86., 134., 194., 188., 176., 107., 101.],
+                       [77., 102., 128., 138., 124., 93., 94.],
+                       [105., 100., 99., 104., 100., 113., 129.]], dtype=float)
+
+    kernel = kernel - (kernel.mean())
+    kernel = kernel / (kernel.max() - kernel.min())
+    kernel = np.flipud(kernel)
+    kernel = np.fliplr(kernel)
+    return kernel
+
 
 def create_kernel5():
     kernel = np.array([[-1, -1, -1, -1, -1],
@@ -159,16 +175,19 @@ def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
     threshold = 0.25
     c_image = ndimage.gaussian_filter(c_image, sigma=1)
 
-    after_filter = c_image
+    after_filter = None
 
-    kernels = [create_kernel3(), create_kernel5(), create_kernel10(), create_kernel21(), create_kernel25()]
-    kernels = [create_kernel10(), create_kernel21()]
+    # kernels = [create_kernel3(), create_kernel5(), create_kernel7(), create_kernel10(), create_kernel21(), create_kernel25()]
+    kernels = [create_kernel7(), create_kernel10(), create_kernel21()]
 
     for kernel in kernels:
-        after_filter = sg.convolve2d(after_filter, kernel, boundary="symm", mode="same")
-        after_filter = after_filter / (after_filter.max() - after_filter.min())
+        if after_filter is None:
+            after_filter = sg.convolve2d(c_image, kernel, boundary="symm", mode="same")
+        else:
+            cur_filter = sg.convolve2d(c_image, kernel, boundary="symm", mode="same")
+            after_filter += cur_filter
 
-
+    after_filter = after_filter / (after_filter.max() - after_filter.min())
     fig_ax.imshow(after_filter)
     fig_ax.set_title('filter')
 
