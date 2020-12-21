@@ -19,15 +19,10 @@ def test_find_tfl_lights(path_img):
 
 
 def is_contain_tfl_by_img(labled_img):
-    # labled_img np.array
-    # path_ = './data/gtFine/train/aachen/aachen_000010_000019_gtFine_labelIds.png'
-    # labled_img = np.array(Image.open(path_))
     return 19 in labled_img.flatten()
 
 
 def is_contain_tfl_by_img_and_cord(labled_img, cord):
-    path_ = './data/gtFine/train/aachen/aachen_000010_000019_gtFine_labelIds.png'
-    labled_img = np.array(Image.open(path_))
     return labled_img[cord[0], cord[1]] == 19
 
 
@@ -37,22 +32,22 @@ def main():
     print(flist_gt)
 
     for gt_path in flist_gt:
-        plt.figure()
-        ax1 = plt.subplot(211)
-        ax2 = plt.subplot(212, sharex=ax1, sharey=ax1)
-
-        image_path = gt_path.replace('_gtFine_labelIds.png', '_leftImg8bit.png')
-        image_path = image_path.replace('gtFine', 'leftImg8bit')
-
-        picture = np.array(Image.open(image_path))
-        ax1.imshow(picture)
-
         picture_gt = np.array(Image.open(gt_path))
-        ax2.imshow(picture_gt)
+        if is_contain_tfl_by_img(picture_gt):
+            plt.figure()
+            ax1 = plt.subplot(211)
+            ax2 = plt.subplot(212, sharex=ax1, sharey=ax1)
 
-        plt.show(block=True)
+            image_path = gt_path.replace('_gtFine_labelIds.png', '_leftImg8bit.png')
+            image_path = image_path.replace('gtFine', 'leftImg8bit')
+
+            picture = np.array(Image.open(image_path))
+            ax1.imshow(picture)
+
+            ax2.imshow(picture_gt)
+
+            plt.show(block=True)
 
 
 if __name__ == '__main__':
-    # main()
-    is_contain_tfl_by_img("s")
+    main()
