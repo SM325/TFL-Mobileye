@@ -1,5 +1,6 @@
 from phase1 import *
 
+
 def test_find_tfl_lights(path_img):
     picture = np.array(Image.open(path_img)).astype(float) / 255
     highpass_filter_green = high_pass_filter_green(picture)
@@ -17,24 +18,26 @@ def test_find_tfl_lights(path_img):
     return x_all, y_all
 
 
-def main(argv=None):
-    original_images_base = './data/leftImg8bit'
+def main():
     ground_truth_base = './data/gtFine'
+    flist_gt = glob.glob(os.path.join(ground_truth_base, 'train/*', '*_gtFine_labelIds.png'))
+    print(flist_gt)
 
-    flist = glob.glob(os.path.join(original_images_base,'train/aachen', '*_leftImg8bit.png'))
+    for gt_path in flist_gt:
+        plt.figure()
+        ax1 = plt.subplot(211)
+        ax2 = plt.subplot(212, sharex=ax1, sharey=ax1)
 
-    for image in flist:
-        picture = np.array(Image.open(image)) # uint8 pic
-        json_fn = image.replace('_leftImg8bit.png', '_gtFine_polygons.json')
-        if not os.path.exists(json_fn):
-            json_fn = None
-        # print(test_find_tfl_lights(image))
-    # default_base = './data'
-    # flist = glob.glob(os.path.join(default_base, '*_leftImg8bit.png'))
-    #
-    # for image in flist:
-    #     test_find_tfl_lights(image)
-    #     plt.show(block=True)
+        image_path = gt_path.replace('_gtFine_labelIds.png', '_leftImg8bit.png')
+        image_path = image_path.replace('gtFine', 'leftImg8bit')
+
+        picture = np.array(Image.open(image_path))
+        ax1.imshow(picture)
+
+        picture_gt = np.array(Image.open(gt_path))
+        ax2.imshow(picture_gt)
+
+        plt.show(block=True)
 
 
 if __name__ == '__main__':
