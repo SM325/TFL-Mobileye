@@ -31,8 +31,9 @@ def is_contain_tfl_by_img_and_cord(labled_img, cord):
 
 
 def crop_img_by_center(img, cord):
-    path_ = './data/leftImg8bit/train/aachen/aachen_000010_000019_leftImg8bit.png'
-    img = np.array(Image.open(path_))
+    #get np.array return image
+    # path_ = './data/leftImg8bit/train/aachen/aachen_000010_000019_leftImg8bit.png'
+    # img = np.array(Image.open(path_))
     height, width, _ = img.shape
     left = cord[0] - 40
     top = cord[1] - 40
