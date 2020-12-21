@@ -52,17 +52,22 @@ def get_separated_coor(img_path, gt_img):
 
     return true_list, false_list
 
+def senty_check(data_list, lable_list):
+    print(lable_list)
+    plt.figure()
+    for i in range(min(25, len(data_list))):
+        plt.subplot(5,5 , i + 1).imshow(data_list[i])
+        plt.subplot(5,5 , i + 1).set_title(lable_list[i])
+    plt.show(block=True)
+
 
 def crop_and_labled(true_list, false_list, orginal_img):
     data_list = []
     lable_list = []
     for coor in true_list:
-        print(coor)
         croped_image = crop_img_by_center(orginal_img, coor)
         data_list.append(croped_image)
         lable_list.append(1)
-        plt.imshow(croped_image)
-        plt.show(block=True)
     for i in range(len(true_list)):
         croped_image = crop_img_by_center(orginal_img, false_list[i])
         data_list.append(croped_image)
@@ -73,9 +78,16 @@ def crop_and_labled(true_list, false_list, orginal_img):
 def main():
     ground_truth_base = './data/gtFine'
     flist_gt = glob.glob(os.path.join(ground_truth_base, 'train/*', '*_gtFine_labelIds.png'))
-    print(flist_gt)
+
+    data_list_all = []
+    lable_list_all = []
+
+    iterations = 50
 
     for gt_path in flist_gt:
+        if iterations <= 0:
+            break
+        iterations -= 1
         picture_gt = np.array(Image.open(gt_path))
         if is_contain_tfl_by_img(picture_gt):
             orginal_path = get_img_path_from_gt(gt_path)
@@ -83,19 +95,21 @@ def main():
 
             true_list, false_list = get_separated_coor(orginal_path, picture_gt)
 
-            print(true_list, false_list)
-
             data_list, lable_list = crop_and_labled(true_list, false_list, orginal_img)
 
-            plt.figure()
-            ax1 = plt.subplot(211)
-            ax2 = plt.subplot(212, sharex=ax1, sharey=ax1)
+            data_list_all = data_list_all + data_list
+            lable_list_all = lable_list_all + lable_list
 
-            ax1.imshow(orginal_img)
-
-            ax2.imshow(picture_gt)
-
-            plt.show(block=True)
+            # plt.figure()
+            # ax1 = plt.subplot(2,1,1)
+            # ax2 = plt.subplot(2,1,2, sharex=ax1, sharey=ax1)
+            #
+            # ax1.imshow(orginal_img)
+            #
+            # ax2.imshow(picture_gt)
+            #
+            # plt.show(block=True)
+    senty_check(data_list_all, lable_list_all)
 
 
 if __name__ == '__main__':
