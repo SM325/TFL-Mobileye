@@ -33,12 +33,42 @@ def get_img_path_from_gt(gt_path):
 def crop_img_by_center(img, cord):
     # get np.array return image
     height, width, _ = img.shape
-    left = cord[0] - 40
-    top = cord[1] - 40
-    right = cord[0] + 41
-    bottom = cord[1] + 41
-    return Image.fromarray(img).crop((left, top, right, bottom))
+    left = cord[1] - 40
+    top = cord[0] - 40
+    right = cord[1] + 41
+    bottom = cord[0] + 41
+    return np.array(Image.fromarray(img).crop((left, top, right, bottom)))
 
+
+def get_separated_coor(img_path, gt_img):
+    ylist, xlist = test_find_tfl_lights(img_path)
+    true_list = []
+    false_list = []
+    for coor in zip(xlist, ylist):
+        if is_contain_tfl_by_img_and_cord(gt_img, coor):
+            true_list.append(coor)
+        else:
+            false_list.append(coor)
+
+    return true_list, false_list
+
+
+def crop_and_labled(true_list, false_list, orginal_img):
+    data_list = []
+    lable_list = []
+    for coor in true_list:
+        print(coor)
+        croped_image = crop_img_by_center(orginal_img, coor)
+        data_list.append(croped_image)
+        lable_list.append(1)
+        plt.imshow(croped_image)
+        plt.show(block=True)
+    for i in range(len(true_list)):
+        croped_image = crop_img_by_center(orginal_img, false_list[i])
+        data_list.append(croped_image)
+        lable_list.append(0)
+
+    return data_list, lable_list
 
 def main():
     ground_truth_base = './data/gtFine'
@@ -48,17 +78,24 @@ def main():
     for gt_path in flist_gt:
         picture_gt = np.array(Image.open(gt_path))
         if is_contain_tfl_by_img(picture_gt):
-           orginal_img = np.array(Image.open(get_img_path_from_gt(gt_path)))
+            orginal_path = get_img_path_from_gt(gt_path)
+            orginal_img = np.array(Image.open(orginal_path))
 
-           # plt.figure()
-           # ax1 = plt.subplot(211)
-           # ax2 = plt.subplot(212, sharex=ax1, sharey=ax1)
-           # 
-           # picture = np.array(Image.open(image_path))
-           # ax1.imshow(picture)
-           #
-           # ax2.imshow(picture_gt)
-           plt.show(block=True)
+            true_list, false_list = get_separated_coor(orginal_path, picture_gt)
+
+            print(true_list, false_list)
+
+            data_list, lable_list = crop_and_labled(true_list, false_list, orginal_img)
+
+            plt.figure()
+            ax1 = plt.subplot(211)
+            ax2 = plt.subplot(212, sharex=ax1, sharey=ax1)
+
+            ax1.imshow(orginal_img)
+
+            ax2.imshow(picture_gt)
+
+            plt.show(block=True)
 
 
 if __name__ == '__main__':
