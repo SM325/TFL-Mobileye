@@ -17,6 +17,19 @@ def test_find_tfl_lights(path_img):
     return x_all, y_all
 
 
+def is_contain_tfl_by_img(labled_img):
+    # labled_img np.array
+    # path_ = './data/gtFine/train/aachen/aachen_000010_000019_gtFine_labelIds.png'
+    # labled_img = np.array(Image.open(path_))
+    return 19 in labled_img.flatten()
+
+
+def is_contain_tfl_by_img_and_cord(labled_img, cord):
+    path_ = './data/gtFine/train/aachen/aachen_000010_000019_gtFine_labelIds.png'
+    labled_img = np.array(Image.open(path_))
+    return labled_img[cord[0], cord[1]] == 19
+
+
 def main(argv=None):
     original_images_base = './data/leftImg8bit'
     ground_truth_base = './data/gtFine'
@@ -38,4 +51,5 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    is_contain_tfl_by_img("s")
