@@ -95,7 +95,7 @@ def crop_and_labled(true_list, false_list, orginal_img):
 
 
 def main():
-    second_dirs = {"train", "val"}
+    second_dirs = {"val"}
     for second_dir in second_dirs:
         ground_truth_base = './data/gtFine'
         flist_gt = glob.glob(os.path.join(ground_truth_base, second_dir, '*', '*_gtFine_labelIds.png'))
@@ -106,7 +106,6 @@ def main():
         for gt_path in flist_gt:
             picture_gt = np.array(Image.open(gt_path))
             if is_contain_tfl_by_img(picture_gt):
-                print(gt_path)
                 orginal_path = get_img_path_from_gt(gt_path)
                 if not os.path.exists(orginal_path):
                     continue
