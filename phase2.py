@@ -82,14 +82,28 @@ def senty_check(data_list, lable_list):
 def crop_and_labled(true_list, false_list, orginal_img):
     data_list = []
     lable_list = []
-    for coor in true_list:
-        croped_image = crop_img_by_center(orginal_img, coor)
-        data_list.append(croped_image)
-        lable_list.append(1)
-    for i in range(len(true_list)):
-        croped_image = crop_img_by_center(orginal_img, false_list[i])
-        data_list.append(croped_image)
-        lable_list.append(0)
+    if len(true_list) == 0:
+        return [], []
+    interval = len(false_list) // len(true_list)
+    if len(false_list) >= len(true_list):
+        for coor in true_list:
+            croped_image = crop_img_by_center(orginal_img, coor)
+            data_list.append(croped_image)
+            lable_list.append(1)
+        for i in range(len(true_list)):
+            croped_image = crop_img_by_center(orginal_img, false_list[i * interval])
+            data_list.append(croped_image)
+            lable_list.append(0)
+    else:
+        interval = len(true_list) // len(false_list)
+        for coor in false_list:
+            croped_image = crop_img_by_center(orginal_img, coor)
+            data_list.append(croped_image)
+            lable_list.append(0)
+        for i in range(len(false_list)):
+            croped_image = crop_img_by_center(orginal_img, true_list[i * interval])
+            data_list.append(croped_image)
+            lable_list.append(1)
 
     return data_list, lable_list
 
