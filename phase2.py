@@ -41,6 +41,7 @@ def is_contain_tfl_by_img(labled_img):
 def is_contain_tfl_by_img_and_cord(labled_img, cord):
     return labled_img[cord[0], cord[1]] == 19
 
+
 def get_img_path_from_gt(gt_path):
     image_path = gt_path.replace('_gtFine_labelIds.png', '_leftImg8bit.png')
     return image_path.replace('gtFine', 'leftImg8bit')
@@ -68,12 +69,13 @@ def get_separated_coor(img_path, gt_img):
 
     return true_list, false_list
 
+
 def senty_check(data_list, lable_list):
     print(lable_list)
     plt.figure()
     for i in range(min(25, len(data_list))):
-        plt.subplot(5,5 , i + 1).imshow(data_list[i])
-        plt.subplot(5,5 , i + 1).set_title(lable_list[i])
+        plt.subplot(5, 5, i + 1).imshow(data_list[i])
+        plt.subplot(5, 5, i + 1).set_title(lable_list[i])
     plt.show(block=True)
 
 
@@ -91,24 +93,23 @@ def crop_and_labled(true_list, false_list, orginal_img):
 
     return data_list, lable_list
 
+
 def main():
     second_dirs = {"train", "val"}
     for second_dir in second_dirs:
         ground_truth_base = './data/gtFine'
-        flist_gt = glob.glob(os.path.join(ground_truth_base,second_dir, '*', '*_gtFine_labelIds.png'))
+        flist_gt = glob.glob(os.path.join(ground_truth_base, second_dir, '*', '*_gtFine_labelIds.png'))
 
         data_list_all = []
         lable_list_all = []
 
-        iterations = 5
-
         for gt_path in flist_gt:
-            if iterations <= 0:
-                break
-            iterations -= 1
             picture_gt = np.array(Image.open(gt_path))
             if is_contain_tfl_by_img(picture_gt):
+                print(gt_path)
                 orginal_path = get_img_path_from_gt(gt_path)
+                if not os.path.exists(orginal_path):
+                    continue
                 orginal_img = np.array(Image.open(orginal_path))
 
                 true_list, false_list = get_separated_coor(orginal_path, picture_gt)
@@ -120,12 +121,12 @@ def main():
 
         save_bin(data_list_all, lable_list_all, second_dir)
 
+
 def save_bin(data_list_all, lable_list_all, second_dir):
-    np.array(data_list_all).tofile('./Data_dir/'+second_dir+'/data.bin')
-    np.array(lable_list_all).astype('uint8').tofile('./Data_dir/'+second_dir+'/labels.bin')
+    np.array(data_list_all).tofile('./Data_dir/' + second_dir + '/data.bin')
+    np.array(lable_list_all).astype('uint8').tofile('./Data_dir/' + second_dir + '/labels.bin')
 
 
 if __name__ == '__main__':
     main()
-    # plt.imshow(crop_img_by_center(0, (2048, 200)))
     print("end")
