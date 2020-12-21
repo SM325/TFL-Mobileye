@@ -1,15 +1,8 @@
-.gitignore
 __pycache__/
 debug.log
-Untitled.ipynb
+*.ipynb
 .idea/
-blur.ipynb
-grades.xlsx
-test.py
-Untitled_first.ipynb
-.ipynb_checkpoints/
 data/
-test_conv.py
-Untitled1.ipynb
+
 
 

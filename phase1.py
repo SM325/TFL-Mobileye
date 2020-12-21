@@ -4,27 +4,24 @@ import scipy.ndimage.filters as filters
 import numpy as np
 from scipy import signal
 import scipy.ndimage as ndimage
-
 import os
-import json
 import glob
-import argparse
-
 
 
 def high_pass_filter_green(img):
-    highpass_filter = np.array([[-1/9, -1/9, -1/9],
-                   [-1/9, 8/9, -1/9],
-                   [-1/9, -1/9, -1/9]])
+    highpass_filter = np.array([[-1 / 9, -1 / 9, -1 / 9],
+                                [-1 / 9, 8 / 9, -1 / 9],
+                                [-1 / 9, -1 / 9, -1 / 9]])
 
-    return signal.convolve2d(img[:,:, 1], highpass_filter,  boundary="symm", mode="same")
+    return signal.convolve2d(img[:, :, 1], highpass_filter, boundary="symm", mode="same")
+
 
 def high_pass_filter_red(img):
-    highpass_filter = np.array([[-1/9, -1/9, -1/9],
-                   [-1/9, 8/9, -1/9],
-                   [-1/9, -1/9, -1/9]])
+    highpass_filter = np.array([[-1 / 9, -1 / 9, -1 / 9],
+                                [-1 / 9, 8 / 9, -1 / 9],
+                                [-1 / 9, -1 / 9, -1 / 9]])
 
-    return signal.convolve2d(img[:,:, 0], highpass_filter,  boundary="symm", mode="same")
+    return signal.convolve2d(img[:, :, 0], highpass_filter, boundary="symm", mode="same")
 
 
 def recognize_traffic_light(img):
@@ -50,8 +47,8 @@ def recognize_traffic_light(img):
         y.append(y_center)
     return x, y
 
-def print_picture(path_img):
 
+def print_picture(path_img):
     picture = np.array(Image.open(path_img)).astype(float) / 255
 
     highpass_filter_green = high_pass_filter_green(picture)
@@ -96,23 +93,10 @@ def print_picture(path_img):
 
 
 def main(argv=None):
-
-    # parser = argparse.ArgumentParser("Test TFL attention mechanism")
-    # parser.add_argument('-i', '--image', type=str, help='Path to an image')
-    # parser.add_argument("-j", "--json", type=str, help="Path to json GT for comparison")
-    # parser.add_argument('-d', '--dir', type=str, help='Directory to scan images in')
-    # args = parser.parse_args(argv)
     default_base = './data'
-    # if args.dir is None:
-    #     args.dir = default_base
     flist = glob.glob(os.path.join(default_base, '*_leftImg8bit.png'))
 
     for image in flist:
-        # json_fn = image.replace('_leftImg8bit.png', '_gtFine_polygons.json')
-        # if not os.path.exists(json_fn):
-        #     json_fn = None
-
-        # test_find_tfl_lights(image, json_fn)
         print_picture(image)
         plt.show(block=True)
 
@@ -120,6 +104,7 @@ def main(argv=None):
         print("You should now see some images, with the ground truth marked on them. Close all to quit.")
     else:
         print("Bad configuration?? Didn't find any picture to show")
+        
     plt.show(block=True)
 
 
