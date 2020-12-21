@@ -62,7 +62,17 @@ def print_picture(path_img):
 
     x_red_, y_red_ = [], []
     for i in range(len(x_red)):
-        if (x_red[i] not in x_green and not y_red[i] in y_green):
+        left = x_red[i] - 75
+        right = x_red[i] + 75
+        top = y_red[i] - 75
+        bottom = y_red[i] + 75
+        to_append = True
+        for x_ind in range(left, right):
+            for y_ind in range(top, bottom):
+                if (x_ind in x_green and y_ind in y_green):
+                    to_append = False
+
+        if to_append:
             x_red_.append(x_red[i])
             y_red_.append(y_red[i])
 
@@ -93,7 +103,7 @@ def print_picture(path_img):
 
 
 def main(argv=None):
-    default_base = './data'
+    default_base = './data/leftImg8bit/train/aachen'
     flist = glob.glob(os.path.join(default_base, '*_leftImg8bit.png'))
 
     for image in flist:

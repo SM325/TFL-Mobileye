@@ -8,11 +8,27 @@ def test_find_tfl_lights(path_img):
     x_green, y_green = recognize_traffic_light(highpass_filter_green)
     x_red, y_red = recognize_traffic_light(highpass_filter_red)
     picture2 = np.array(Image.open(path_img))
+    # x_red_, y_red_ = [], []
+    # for i in range(len(x_red)):
+    #     if (x_red[i] not in x_green and not y_red[i] in y_green):
+    #         x_red_.append(x_red[i])
+    #         y_red_.append(y_red[i])
     x_red_, y_red_ = [], []
     for i in range(len(x_red)):
-        if (x_red[i] not in x_green and not y_red[i] in y_green):
+        left = x_red[i] - 75
+        right = x_red[i] + 75
+        top = y_red[i] - 75
+        bottom = y_red[i] + 75
+        to_append = True
+        for x_ind in range(left, right):
+            for y_ind in range(top, bottom):
+                if (x_ind in x_green and y_ind in y_green):
+                    to_append = False
+
+        if to_append:
             x_red_.append(x_red[i])
             y_red_.append(y_red[i])
+
     x_all = x_green + x_red_
     y_all = y_green + y_red_
     return x_all, y_all
@@ -114,5 +130,5 @@ def main():
 
 if __name__ == '__main__':
     main()
-    plt.imshow(crop_img_by_center(0, (2048, 200)))
+    # plt.imshow(crop_img_by_center(0, (2048, 200)))
     print("end")
