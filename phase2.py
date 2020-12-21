@@ -116,19 +116,22 @@ def main():
         lable_list_all = []
 
         for gt_path in flist_gt:
-            picture_gt = np.array(Image.open(gt_path))
-            if is_contain_tfl_by_img(picture_gt):
-                orginal_path = get_img_path_from_gt(gt_path)
-                if not os.path.exists(orginal_path):
-                    continue
-                orginal_img = np.array(Image.open(orginal_path))
+            try:
+                picture_gt = np.array(Image.open(gt_path))
+                if is_contain_tfl_by_img(picture_gt):
+                    orginal_path = get_img_path_from_gt(gt_path)
+                    if not os.path.exists(orginal_path):
+                        continue
+                    orginal_img = np.array(Image.open(orginal_path))
 
-                true_list, false_list = get_separated_coor(orginal_path, picture_gt)
+                    true_list, false_list = get_separated_coor(orginal_path, picture_gt)
 
-                data_list, lable_list = crop_and_labled(true_list, false_list, orginal_img)
+                    data_list, lable_list = crop_and_labled(true_list, false_list, orginal_img)
 
-                data_list_all = data_list_all + data_list
-                lable_list_all = lable_list_all + lable_list
+                    data_list_all = data_list_all + data_list
+                    lable_list_all = lable_list_all + lable_list
+            except:
+                print("error in file", gt_path )
 
         save_bin(data_list_all, lable_list_all, second_dir)
 
