@@ -92,40 +92,37 @@ def crop_and_labled(true_list, false_list, orginal_img):
     return data_list, lable_list
 
 def main():
-    ground_truth_base = './data/gtFine'
-    flist_gt = glob.glob(os.path.join(ground_truth_base, 'train/*', '*_gtFine_labelIds.png'))
+    second_dirs = {"train", "val"}
+    for second_dir in second_dirs:
+        ground_truth_base = './data/gtFine'
+        flist_gt = glob.glob(os.path.join(ground_truth_base,second_dir, '*', '*_gtFine_labelIds.png'))
 
-    data_list_all = []
-    lable_list_all = []
+        data_list_all = []
+        lable_list_all = []
 
-    iterations = 50
+        iterations = 5
 
-    for gt_path in flist_gt:
-        if iterations <= 0:
-            break
-        iterations -= 1
-        picture_gt = np.array(Image.open(gt_path))
-        if is_contain_tfl_by_img(picture_gt):
-            orginal_path = get_img_path_from_gt(gt_path)
-            orginal_img = np.array(Image.open(orginal_path))
+        for gt_path in flist_gt:
+            if iterations <= 0:
+                break
+            iterations -= 1
+            picture_gt = np.array(Image.open(gt_path))
+            if is_contain_tfl_by_img(picture_gt):
+                orginal_path = get_img_path_from_gt(gt_path)
+                orginal_img = np.array(Image.open(orginal_path))
 
-            true_list, false_list = get_separated_coor(orginal_path, picture_gt)
+                true_list, false_list = get_separated_coor(orginal_path, picture_gt)
 
-            data_list, lable_list = crop_and_labled(true_list, false_list, orginal_img)
+                data_list, lable_list = crop_and_labled(true_list, false_list, orginal_img)
 
-            data_list_all = data_list_all + data_list
-            lable_list_all = lable_list_all + lable_list
+                data_list_all = data_list_all + data_list
+                lable_list_all = lable_list_all + lable_list
 
-            # plt.figure()
-            # ax1 = plt.subplot(2,1,1)
-            # ax2 = plt.subplot(2,1,2, sharex=ax1, sharey=ax1)
-            #
-            # ax1.imshow(orginal_img)
-            #
-            # ax2.imshow(picture_gt)
-            #
-            # plt.show(block=True)
-    senty_check(data_list_all, lable_list_all)
+        save_bin(data_list_all, lable_list_all, second_dir)
+
+def save_bin(data_list_all, lable_list_all, second_dir):
+    np.array(data_list_all).tofile('./Data_dir/'+second_dir+'/data.bin')
+    np.array(lable_list_all).astype('uint8').tofile('./Data_dir/'+second_dir+'/labels.bin')
 
 
 if __name__ == '__main__':
