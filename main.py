@@ -156,12 +156,12 @@ def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
     :param kwargs: Whatever config you want to pass in here
     :return: 4-tuple of x_red, y_red, x_green, y_green
     """
-    threshold = 0.25
+    threshold = 0.20
     c_image = ndimage.gaussian_filter(c_image, sigma=1)
 
     after_filter = c_image
     # kernels = [create_kernel3(), create_kernel5(), create_kernel10(), create_kernel21(), create_kernel25()]
-    kernels = [create_kernel10()]
+    kernels = [create_kernel10(), create_kernel21()]
 
     for kernel in kernels:
         after_filter = sg.convolve2d(after_filter, kernel, boundary="symm", mode="same")
@@ -227,6 +227,10 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
     color_image = np.array(Image.open(image_path))
     image = np.array(Image.open(image_path).convert("L"), dtype=float)
     image /= 255
+    # red_image = np.array(color_image[:, :, 0])
+    # red_image = red_image / 255
+    # green_image = color_image[:, :, 1]
+    # # green_image /= 255
 
     if json_path is None:
         objects = None
@@ -235,7 +239,7 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
         what = ['traffic light']
         objects = [o for o in gt_data['objects'] if o['label'] in what]
 
-    # show_image_and_gt(image, objects, fig_num)
+    show_image_and_gt(image, objects, fig_num)
     plt.figure()
     ax1 = plt.subplot(221)
     ax2 = plt.subplot(222, sharex=ax1, sharey=ax1)
@@ -270,7 +274,7 @@ def main(argv=None):
     parser.add_argument("-j", "--json", type=str, help="Path to json GT for comparison")
     parser.add_argument('-d', '--dir', type=str, help='Directory to scan images in')
     args = parser.parse_args(argv)
-    default_base = './data/data3'
+    default_base = './data'
     if args.dir is None:
         args.dir = default_base
     flist = glob.glob(os.path.join(args.dir, '*_leftImg8bit.png'))
