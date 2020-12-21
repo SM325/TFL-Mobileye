@@ -25,8 +25,26 @@ def is_contain_tfl_by_img(labled_img):
 def is_contain_tfl_by_img_and_cord(labled_img, cord):
     return labled_img[cord[0], cord[1]] == 19
 
+def crop_img_by_center(img, cord):
+    #get np.array return image
+    # path_ = './data/leftImg8bit/train/aachen/aachen_000010_000019_leftImg8bit.png'
+    # img = np.array(Image.open(path_))
+    height, width, _ = img.shape
+    left = cord[0] - 40
+    top = cord[1] - 40
+    right = cord[0] + 41
+    bottom = cord[1] + 41
+    # if left < 0:
+    #     padding_size = -left
+    #     padding_arr = np.zeros((padding_size * height * 3), dtype=img.dtype).reshape(( height, padding_size, 3))
+    #     img = np.hstack((padding_arr, img))
+    #     left += padding_size
+    #     right += padding_size
+    # plt.imshow(img)
+    return Image.fromarray(img).crop((left, top, right, bottom))
+    # plt.imshow(res)
 
-def main():
+def main(argv=None):
     ground_truth_base = './data/gtFine'
     flist_gt = glob.glob(os.path.join(ground_truth_base, 'train/*', '*_gtFine_labelIds.png'))
     print(flist_gt)
@@ -48,6 +66,7 @@ def main():
 
             plt.show(block=True)
 
-
 if __name__ == '__main__':
     main()
+    plt.imshow(crop_img_by_center(0, (2048, 200)))
+    print("end")
