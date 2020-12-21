@@ -107,7 +107,7 @@ def crop_and_labled(true_list, false_list, orginal_img):
 
 
 def main():
-    second_dirs = {"val"}
+    second_dirs = {"train"}
     for second_dir in second_dirs:
         ground_truth_base = './data/gtFine'
         flist_gt = glob.glob(os.path.join(ground_truth_base, second_dir, '*', '*_gtFine_labelIds.png'))
