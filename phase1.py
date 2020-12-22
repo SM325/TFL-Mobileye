@@ -40,11 +40,11 @@ def recognize_traffic_light(img):
 
     x, y = [], []
     for dy, dx in slices:
-        # if (dx.start > 5 and dx.start < 1995 and dy.start > 5 and dy.start < 995):
-        x_center = int((dx.start + dx.stop - 1) / 2)
-        x.append(x_center)
-        y_center = int((dy.start + dy.stop - 1) / 2)
-        y.append(y_center)
+        if (dx.start > 5 and dx.start < 1995 and dy.start > 5 and dy.start < 995):
+            x_center = int((dx.start + dx.stop - 1) / 2)
+            x.append(x_center)
+            y_center = int((dy.start + dy.stop - 1) / 2)
+            y.append(y_center)
     return x, y
 
 

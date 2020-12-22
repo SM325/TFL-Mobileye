@@ -110,11 +110,10 @@ def main():
     second_dirs = {"train"}
     for second_dir in second_dirs:
         ground_truth_base = './data/gtFine'
-        flist_gt = glob.glob(os.path.join(ground_truth_base, second_dir, '*', '*_gtFine_labelIds.png'))
+        flist_gt = glob.glob(os.path.join(ground_truth_base, second_dir, 'aachen', '*_gtFine_labelIds.png'))
 
         data_list_all = []
         lable_list_all = []
-
         for gt_path in flist_gt:
             try:
                 picture_gt = np.array(Image.open(gt_path))
@@ -132,7 +131,6 @@ def main():
                     lable_list_all = lable_list_all + lable_list
             except:
                 print("error in file", gt_path )
-
         save_bin(data_list_all, lable_list_all, second_dir)
 
 
