@@ -1,11 +1,9 @@
-import part3.SFM_solution as SFM
+import part3.SFM as SFM
 import numpy as np
 import pickle
 import matplotlib._png as png
 import matplotlib.pyplot as plt
 from PIL import Image
-
-
 
 def visualize(prev_container, curr_container, focal, pp):
     norm_prev_pts, norm_curr_pts, R, norm_foe, tZ = SFM.prepare_3D_data(prev_container, curr_container, focal, pp)
@@ -15,6 +13,9 @@ def visualize(prev_container, curr_container, focal, pp):
 
     fig, (curr_sec, prev_sec) = plt.subplots(1, 2, figsize=(12,6))
     print('after unnormilize', rot_pts)
+    print('after unnormilize', rot_pts)
+
+    fig, (curr_sec, prev_sec) = plt.subplots(1, 2, figsize=(12,6))
     prev_sec.set_title('prev(' + str(prev_frame_id) + ')')
     prev_sec.imshow(prev_container.img)
     prev_p = prev_container.traffic_light
@@ -36,6 +37,11 @@ def visualize(prev_container, curr_container, focal, pp):
 class FrameContainer(object):
     def __init__(self, img_path):
         self.img = np.asarray(Image.open(img_path))#png.read_png_int(img_path)
+    plt.show()
+    
+class FrameContainer(object):
+    def __init__(self, img_path):
+        self.img = np.asarray(Image.open(img_path)) #png.read_png_int(img_path)
         self.traffic_light = []
         self.traffic_lights_3d_location = []
         self.EM = []
@@ -48,7 +54,6 @@ prev_frame_id = 28
 pkl_path = 'part3/dusseldorf_000049.pkl'
 prev_img_path = 'part3/dusseldorf_000049_0000' + str(prev_frame_id) + '_leftImg8bit.png'
 curr_img_path = 'part3/dusseldorf_000049_0000' + str(curr_frame_id) + '_leftImg8bit.png'
-
 prev_container = FrameContainer(prev_img_path)
 curr_container = FrameContainer(curr_img_path)
 with open(pkl_path, 'rb') as pklfile:
