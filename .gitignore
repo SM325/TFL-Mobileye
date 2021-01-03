@@ -4,6 +4,8 @@ debug.log
 *.ipynb
 .idea/
 data/
+*.docx
+
 Data_dir/
 
 

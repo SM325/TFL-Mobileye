@@ -156,19 +156,19 @@ def find_tfl_lights(c_image: np.ndarray, fig_ax, **kwargs):
     :param kwargs: Whatever config you want to pass in here
     :return: 4-tuple of x_red, y_red, x_green, y_green
     """
-    threshold = 0.20
+    threshold = 0.3
     c_image = ndimage.gaussian_filter(c_image, sigma=1)
 
     after_filter = c_image
     # kernels = [create_kernel3(), create_kernel5(), create_kernel10(), create_kernel21(), create_kernel25()]
-    kernels = [create_kernel10(), create_kernel21()]
+    kernels = [create_kernel3(), create_kernel10()]
 
     for kernel in kernels:
         after_filter = sg.convolve2d(after_filter, kernel, boundary="symm", mode="same")
         after_filter = after_filter / (after_filter.max() - after_filter.min())
 
-    fig_ax.imshow(after_filter)
-    fig_ax.set_title('filter')
+    # fig_ax.imshow(after_filter)
+    # fig_ax.set_title('filter')
 
     return non_max_suppression(after_filter, threshold)
 
@@ -183,12 +183,12 @@ def non_max_suppression(after_filter, threshold):
     for dy, dx in slices:
         x.append(dx)
         y.append(dy)
-    print(len(x))
+    # print(len(x))
     return x, y
 
 
 def non_max_suppression2(after_filter, threshold):
-    threshold = 0.25
+    threshold = 0.25 # no
     data_max = maximum_filter(after_filter, 75)
     maxima = (after_filter == data_max)
     data_min = minimum_filter(after_filter, 75)
@@ -208,8 +208,8 @@ def non_max_suppression2(after_filter, threshold):
 
 
 def show_image_and_gt(image, objs, fig_num=None):
-    plt.imshow(image)
-    plt.subplot()
+    # plt.imshow(image)
+    # plt.subplot()
     labels = set()
     if objs is not None:
         for o in objs:
@@ -258,10 +258,13 @@ def test_find_tfl_lights(image_path, json_path=None, fig_num=None):
     for x, y in cord:
         red_val = color_image[y, x, 0]
         green_val = color_image[y, x, 1]
+        blue_val = color_image[y, x, 2]
+
+
         if red_val >= green_val:
             ax2.plot(x, y, 'r+', color='r', markersize=5)
         else:
-            ax2.plot(x, y, 'b+', color='b', markersize=7)
+            ax2.plot(x, y, 'g+', color='g', markersize=7)
 
 
 def main(argv=None):
@@ -274,18 +277,22 @@ def main(argv=None):
     parser.add_argument("-j", "--json", type=str, help="Path to json GT for comparison")
     parser.add_argument('-d', '--dir', type=str, help='Directory to scan images in')
     args = parser.parse_args(argv)
-    default_base = './data'
+    default_base = './data/leftImg8bit/train/aachen'
     if args.dir is None:
         args.dir = default_base
     flist = glob.glob(os.path.join(args.dir, '*_leftImg8bit.png'))
-
+    counter = 21
     for image in flist:
+        if counter <=0 :
+            break
+        counter-=1
         json_fn = image.replace('_leftImg8bit.png', '_gtFine_polygons.json')
         if not os.path.exists(json_fn):
             json_fn = None
 
+
         test_find_tfl_lights(image, json_fn)
-        plt.show(block=True)
+        # plt.show(block=True)
 
     if len(flist):
         print("You should now see some images, with the ground truth marked on them. Close all to quit.")
