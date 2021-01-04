@@ -13,8 +13,8 @@ def calc_TFL_dist(prev_container, curr_container, focal, pp):
     return curr_container
 
 def prepare_3D_data(prev_container, curr_container, focal, pp):
-    print("p", prev_container.traffic_light)
-    print("c", curr_container.traffic_light)
+    # print("p", prev_container.traffic_light)
+    # print("c", curr_container.traffic_light)
     norm_prev_pts = normalize(prev_container.traffic_light, focal, pp)
     norm_curr_pts = normalize(curr_container.traffic_light, focal, pp)
     R, foe, tZ = decompose(np.array(curr_container.EM))
@@ -28,10 +28,10 @@ def calc_3D_data(norm_prev_pts, norm_curr_pts, R, foe, tZ):
     for p_curr in norm_curr_pts:
         corresponding_p_ind, corresponding_p_rot = find_corresponding_points(p_curr, norm_rot_pts, foe)
         Z = calc_dist(p_curr, corresponding_p_rot, foe, tZ)
-        print('p_curr', p_curr)
-        print('corresponding_p_rot', corresponding_p_rot)
-        print('foe', foe)
-        print('tZ', tZ)
+        # print('p_curr', p_curr)
+        # print('corresponding_p_rot', corresponding_p_rot)
+        # print('foe', foe)
+        # print('tZ', tZ)
         valid = (Z > 0)
         if not valid:
             Z = 0
@@ -93,4 +93,6 @@ def calc_dist(p_curr, p_rot, foe, tZ):
     z_per_y = (tZ * (foe[1] - p_rot[1])) / (p_curr[1] - p_rot[1])
     print('z_per_x', z_per_x)
     print('z_per_y', z_per_y)
-    return abs(z_per_x + z_per_y) / 2
+    # Z = (z_per_x * abs(foe[0] - p_rot[0]) + z_per_y * abs(foe[1] - p_rot[1])) / (abs(foe[0] - p_rot[0]) + abs(foe[1] - p_rot[1]))
+    Z = (abs(z_per_x) * abs(p_curr[0] - p_rot[0]) + abs(z_per_y) * abs(p_curr[1] - p_rot[1])) / (abs(p_curr[0] - p_rot[0]) + abs(p_curr[1] - p_rot[1]))
+    return Z
