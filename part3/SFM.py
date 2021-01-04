@@ -13,9 +13,6 @@ def calc_TFL_dist(prev_container, curr_container, focal, pp):
     return curr_container
 
 def prepare_3D_data(prev_container, curr_container, focal, pp):
-    norm_prev_pts = normalize(prev_container.traffic_light, focal, pp)
-    norm_curr_pts = normalize(curr_container.traffic_light, focal, pp)
-    R, foe, tZ = decompose(np.array(curr_container))
     print("p", prev_container.traffic_light)
     print("c", curr_container.traffic_light)
     norm_prev_pts = normalize(prev_container.traffic_light, focal, pp)
@@ -93,3 +90,4 @@ def calc_dist(p_curr, p_rot, foe, tZ):
     print('z_per_x', z_per_x)
     print('z_per_y', z_per_y)
     return abs(z_per_x + z_per_y) / 2
+    # return z_per_y

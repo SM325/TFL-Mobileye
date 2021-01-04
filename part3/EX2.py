@@ -13,12 +13,8 @@ def calc_TFL_dist(prev_container, curr_container, focal, pp):
     return curr_container
 
 def prepare_3D_data(prev_container, curr_container, focal, pp):
-<<<<<<< HEAD
     print("p", prev_container.traffic_light)
     print("c", curr_container.traffic_light)
-
-=======
->>>>>>> ca4423aa1281faf3bc62c598ecc8e94f8a757ee3
     norm_prev_pts = normalize(prev_container.traffic_light, focal, pp)
     norm_curr_pts = normalize(curr_container.traffic_light, focal, pp)
     R, foe, tZ = decompose(np.array(curr_container.EM))
@@ -80,10 +76,7 @@ def find_corresponding_points(p, norm_pts_rot, foe):
 def calc_dist(p_curr, p_rot, foe, tZ):
     Z_x = tZ*(foe[0] - p_rot[0])/(p_curr[0] - p_rot[0])
     Z_y = tZ*(foe[1] - p_rot[1])/(p_curr[1] - p_rot[1])
-<<<<<<< HEAD
     print("z_x", Z_x, "z_y", Z_y)
-=======
->>>>>>> ca4423aa1281faf3bc62c598ecc8e94f8a757ee3
     Z_x_w = abs(p_curr[0] - p_rot[0])
     Z_y_w = abs(p_curr[1] - p_rot[1])
     sum_w = Z_x_w + Z_y_w
