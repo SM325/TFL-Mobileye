@@ -87,8 +87,5 @@ def calc_dist(p_curr, p_rot, foe, tZ):
     # combine the two estimations and return estimated Z
     z_per_x = (tZ * (foe[0] - p_rot[0])) / (p_curr[0] - p_rot[0])
     z_per_y = (tZ * (foe[1] - p_rot[1])) / (p_curr[1] - p_rot[1])
-    print('z_per_x', z_per_x)
-    print('z_per_y', z_per_y)
-    # Z = (z_per_x * abs(foe[0] - p_rot[0]) + z_per_y * abs(foe[1] - p_rot[1])) / (abs(foe[0] - p_rot[0]) + abs(foe[1] - p_rot[1]))
     Z = (abs(z_per_x) * abs(p_curr[0] - p_rot[0]) + abs(z_per_y) * abs(p_curr[1] - p_rot[1])) / (abs(p_curr[0] - p_rot[0]) + abs(p_curr[1] - p_rot[1]))
     return Z
