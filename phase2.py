@@ -1,39 +1,6 @@
 from phase1 import *
 
 
-def test_find_tfl_lights(path_img):
-    picture = np.array(Image.open(path_img)).astype(float) / 255
-    highpass_filter_green = high_pass_filter_green(picture)
-    highpass_filter_red = high_pass_filter_red(picture)
-    x_green, y_green = recognize_traffic_light(highpass_filter_green)
-    x_red, y_red = recognize_traffic_light(highpass_filter_red)
-    picture2 = np.array(Image.open(path_img))
-    # x_red_, y_red_ = [], []
-    # for i in range(len(x_red)):
-    #     if (x_red[i] not in x_green and not y_red[i] in y_green):
-    #         x_red_.append(x_red[i])
-    #         y_red_.append(y_red[i])
-    x_red_, y_red_ = [], []
-    for i in range(len(x_red)):
-        left = x_red[i] - 75
-        right = x_red[i] + 75
-        top = y_red[i] - 75
-        bottom = y_red[i] + 75
-        to_append = True
-        for x_ind in range(left, right):
-            for y_ind in range(top, bottom):
-                if (x_ind in x_green and y_ind in y_green):
-                    to_append = False
-
-        if to_append:
-            x_red_.append(x_red[i])
-            y_red_.append(y_red[i])
-
-    x_all = x_green + x_red_
-    y_all = y_green + y_red_
-    return x_all, y_all
-
-
 def is_contain_tfl_by_img(labled_img):
     return 19 in labled_img.flatten()
 
@@ -150,6 +117,21 @@ def main():
 def save_bin(data_list_all, lable_list_all, second_dir):
     np.array(data_list_all).tofile('./Data_dir/' + second_dir + '/data.bin')
     np.array(lable_list_all).astype('uint8').tofile('./Data_dir/' + second_dir + '/labels.bin')
+
+
+def get_tfl_candidates(img, candidates, auxiliary):
+    res_cand =[]
+    res_aux =[]
+    for i, coord in enumerate(candidates):
+        cropped_img = crop_img_by_center(img, (coord[1], coord[0]))
+        if is_traffic_light(cropped_img):
+            res_cand.append(coord)
+            res_aux.append(auxiliary[i])
+
+    return res_cand, res_aux
+
+def is_traffic_light(cropped_img):
+    return True
 
 
 if __name__ == '__main__':

@@ -42,7 +42,7 @@ class FrameContainer(object):
 # read data and run
 # for curr_frame_id in zip(range(25, 29)):
 curr_frame_id = 29
-prev_frame_id = 28
+prev_frame_id = 24
 pkl_path = 'part3/dusseldorf_000049.pkl'
 prev_img_path = 'part3/dusseldorf_000049_0000' + str(prev_frame_id) + '_leftImg8bit.png'
 curr_img_path = 'part3/dusseldorf_000049_0000' + str(curr_frame_id) + '_leftImg8bit.png'
@@ -52,10 +52,10 @@ with open(pkl_path, 'rb') as pklfile:
     data = pickle.load(pklfile, encoding='latin1')
 focal = data['flx']
 pp = data['principle_point']
-# prev_container.traffic_light = np.array(data['points_' + str(prev_frame_id)][0])
-# curr_container.traffic_light = np.array(data['points_' + str(curr_frame_id)][0])
-prev_container.traffic_light = np.array([[1141, 48 ], [1143, 121 ], [1188, 119 ]])
-curr_container.traffic_light =np.array([[1141, 48 ]])
+prev_container.traffic_light = np.array(data['points_' + str(prev_frame_id)][0])
+curr_container.traffic_light = np.array(data['points_' + str(curr_frame_id)][0])
+# prev_container.traffic_light = np.array([[1141, 48 ], [1143, 121 ], [1188, 119 ]])
+# curr_container.traffic_light =np.array([[1141, 48 ]])
 
 EM = np.eye(4)
 for i in range(prev_frame_id, curr_frame_id):
