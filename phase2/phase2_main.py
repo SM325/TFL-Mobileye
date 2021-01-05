@@ -1,4 +1,4 @@
-from main import *
+from phase2.main import *
 
 
 # def test_find_tfl_lights(path_img):

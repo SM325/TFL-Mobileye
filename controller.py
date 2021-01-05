@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 import phase1
 import phase2
-import part3.SFM as phase3
+import phase3 as phase3
 
 class FrameContainer(object):
     def __init__(self, img_path):

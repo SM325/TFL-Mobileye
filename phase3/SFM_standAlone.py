@@ -1,7 +1,6 @@
-import part3.SFM as SFM
+import phase3 as SFM
 import numpy as np
 import pickle
-import matplotlib._png as png
 import matplotlib.pyplot as plt
 from PIL import Image
 
@@ -47,7 +46,7 @@ class FrameContainer(object):
 # for curr_frame_id in zip(range(25, 29)):
 curr_frame_id = 29
 prev_frame_id = 28
-pkl_path = 'part3/dusseldorf_000049.pkl'
+pkl_path = '../part3/dusseldorf_000049.pkl'
 prev_img_path = 'part3/dusseldorf_000049_0000' + str(prev_frame_id) + '_leftImg8bit.png'
 curr_img_path = 'part3/dusseldorf_000049_0000' + str(curr_frame_id) + '_leftImg8bit.png'
 prev_container = FrameContainer(prev_img_path)
