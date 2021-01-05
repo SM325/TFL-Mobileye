@@ -118,5 +118,77 @@ def main(argv=None):
     plt.show(block=True)
 
 
+
+def test_find_tfl_lights(path_img):
+    picture = np.array(Image.open(path_img)).astype(float) / 255
+    highpass_filter_green = high_pass_filter_green(picture)
+    highpass_filter_red = high_pass_filter_red(picture)
+    x_green, y_green = recognize_traffic_light(highpass_filter_green)
+    x_red, y_red = recognize_traffic_light(highpass_filter_red)
+    picture2 = np.array(Image.open(path_img))
+
+    x_red_, y_red_ = [], []
+    for i in range(len(x_red)):
+        left = x_red[i] - 75
+        right = x_red[i] + 75
+        top = y_red[i] - 75
+        bottom = y_red[i] + 75
+        to_append = True
+        for x_ind in range(left, right):
+            for y_ind in range(top, bottom):
+                if (x_ind in x_green and y_ind in y_green):
+                    to_append = False
+
+        if to_append:
+            x_red_.append(x_red[i])
+            y_red_.append(y_red[i])
+
+    x_all = x_green + x_red_
+    y_all = y_green + y_red_
+    return x_all, y_all
+
+
+def find_tfl_lights(img):
+    picture = img.astype(float) / 255
+    highpass_filter_green = high_pass_filter_green(picture)
+    highpass_filter_red = high_pass_filter_red(picture)
+    x_green, y_green = recognize_traffic_light(highpass_filter_green)
+    x_red, y_red = recognize_traffic_light(highpass_filter_red)
+
+    x_red_, y_red_ = [], []
+    for i in range(len(x_red)):
+        left = x_red[i] - 75
+        right = x_red[i] + 75
+        top = y_red[i] - 75
+        bottom = y_red[i] + 75
+        to_append = True
+        for x_ind in range(left, right):
+            for y_ind in range(top, bottom):
+                if (x_ind in x_green and y_ind in y_green):
+                    to_append = False
+
+        if to_append:
+            x_red_.append(x_red[i])
+            y_red_.append(y_red[i])
+
+    x_all = x_green + x_red_
+    y_all = y_green + y_red_
+
+    cord = zip(x_all, y_all)
+    res_coor =[]
+    res_color =[]
+    for x, y in cord:
+        red_val = picture[y, x, 0]
+        green_val = picture[y, x, 1]
+
+        if red_val >= green_val:
+            res_coor.append([x, y])
+            res_color.append('red')
+        else:
+            res_coor.append([x, y])
+            res_color.append('green')
+
+    return res_coor , res_color
+
 if __name__ == '__main__':
     main()

@@ -28,10 +28,6 @@ def calc_3D_data(norm_prev_pts, norm_curr_pts, R, foe, tZ):
     for p_curr in norm_curr_pts:
         corresponding_p_ind, corresponding_p_rot = find_corresponding_points(p_curr, norm_rot_pts, foe)
         Z = calc_dist(p_curr, corresponding_p_rot, foe, tZ)
-        # print('p_curr', p_curr)
-        # print('corresponding_p_rot', corresponding_p_rot)
-        # print('foe', foe)
-        # print('tZ', tZ)
         valid = (Z > 0)
         if not valid:
             Z = 0
