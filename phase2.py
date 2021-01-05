@@ -39,7 +39,7 @@ def is_front_light(img_path, coor):
 
 
 def get_separated_coor(img_path, gt_img):
-    ylist, xlist = test_find_tfl_lights(img_path, None) # here we change
+    ylist, xlist = test_find_tfl_lights(img_path) # here we change
     true_list = []
     false_list = []
     for coor in zip(xlist, ylist):
@@ -87,7 +87,7 @@ def crop_and_labled(true_list, false_list, orginal_img):
     return data_list, lable_list
 
 
-def main():
+def main_():
     second_dirs = ["test"]
     for second_dir in second_dirs:
         ground_truth_base = './data/gtFine'
