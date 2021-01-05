@@ -1,4 +1,5 @@
 from phase1 import *
+from tensorflow.keras.models import load_model
 
 
 def is_contain_tfl_by_img(labled_img):
@@ -131,7 +132,9 @@ def get_tfl_candidates(img, candidates, auxiliary):
     return res_cand, res_aux
 
 def is_traffic_light(cropped_img):
-    return True
+    loaded_model = load_model("model_final.h5")
+    predictions = loaded_model.predict(np.array([cropped_img]))
+    return np.argmax(predictions[0])
 
 
 if __name__ == '__main__':
