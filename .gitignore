@@ -1,10 +1,13 @@
 __pycache__/
 __pycache__
-debug.log
 *.ipynb
 .idea/
 data/
 *.docx
 t.py
 Data_dir/
+phase1/
+phase2/
+phase3/
+
 
