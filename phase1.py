@@ -26,7 +26,7 @@ def high_pass_filter_red(img):
 
 def recognize_traffic_light(img):
     neighborhood_size = 75
-    threshold = 0.2
+    threshold = 0.18
 
     data_max = filters.maximum_filter(img, neighborhood_size)
     maxima = (img == data_max)

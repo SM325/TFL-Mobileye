@@ -33,17 +33,21 @@ class TFL_Man(object):
         self.prev_container = self.curr_container
         self.curr_container = FrameContainer(frame_img)
 
-        self.run_candidates() # part 1
-        self.run_traffic_light_detection() # part 2
-        self.run_find_distance(i) # part 3
+        self.run_candidates()  # part 1
+        self.run_traffic_light_detection()  # part 2
+        self.run_find_distance(i)  # part 3
 
         self.view(i)
 
     def run_find_distance(self, i):
         if self.prev_container:
             self.curr_container.EM = self.EM_matrixs[i + 24]
-            self.curr_container = phase3.calc_TFL_dist(self.prev_container, self.curr_container, self.focal_len,
-                                                       self.principal_point)
+            corresponding_ind, traffic_lights_3d_location, valid = phase3.calc_TFL_dist(
+                self.prev_container.traffic_light,
+                self.curr_container.traffic_light, self.curr_container.EM,
+                self.focal_len, self.principal_point)
+            if corresponding_ind is not None and traffic_lights_3d_location is not None and valid is not None:
+                self.curr_container.corresponding_ind, self.curr_container.traffic_lights_3d_location, self.curr_container.valid = corresponding_ind, traffic_lights_3d_location, valid
 
     def run_traffic_light_detection(self):
         candidates = self.curr_container.suspicious_points_of_light
