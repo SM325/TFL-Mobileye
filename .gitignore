@@ -11,3 +11,13 @@ phase2/
 phase3/
 
 
+part3/
+*.ipynb_checkpoints/
+.pytest_cache/
+frames_list.json
+SFM_standAlone.py
+TFL_Man.py.profile
+Untitled.ipnb
+
+
+

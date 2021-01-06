@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import cProfile, pstats
+from timebudget import timebudget
 
 import phase1
 import phase2
@@ -30,21 +32,41 @@ class TFL_Man(object):
             self.EM_matrixs[i + 1] = data['egomotion_' + str(i) + '-' + str(i + 1)]
 
     def run(self, i, frame_img):
+        timebudget.report_at_exit() 
         self.prev_container = self.curr_container
         self.curr_container = FrameContainer(frame_img)
 
+        # cProfile.run("self.run_candidates()", "{}.profile".format(__file__))
+        # s = pstats.Stats("{}.profile".format(__file__))
+        # s.strip_dirs()
+        # s.sort_stats("time").print_stats(10)
+
+        # cProfile.runctx('self.run_candidates()', globals(), locals())
+        # cProfile.runctx('self.run_traffic_light_detection()', globals(), locals())
+        # cProfile.runctx('self.run_find_distance()', globals(), locals())
+
+        # p = cProfile.Profile()
+        # p.runcall(self.run_candidates)
+        # p.print_stats()
+        # p = cProfile.Profile()
+        # p.runcall(self.run_traffic_light_detection)
+        # p.print_stats()
+        # p = cProfile.Profile()
+        # p.runcall(self.run_find_distance(i))
+        # p.print_stats()
         self.run_candidates() # part 1
         self.run_traffic_light_detection() # part 2
         self.run_find_distance(i) # part 3
 
         self.view(i)
 
+    @timebudget
     def run_find_distance(self, i):
         if self.prev_container:
             self.curr_container.EM = self.EM_matrixs[i + 24]
             self.curr_container = phase3.calc_TFL_dist(self.prev_container, self.curr_container, self.focal_len,
                                                        self.principal_point)
-
+    @timebudget
     def run_traffic_light_detection(self):
         candidates = self.curr_container.suspicious_points_of_light
         auxiliary = self.curr_container.suspicious_points_auxiliary
@@ -52,6 +74,7 @@ class TFL_Man(object):
         self.curr_container.traffic_light = np.array(traffic_light[0])
         self.curr_container.traffic_light_auxiliary = np.array(traffic_light[1])
 
+    @timebudget
     def run_candidates(self):
         self.curr_container.suspicious_points_of_light, self.curr_container.suspicious_points_auxiliary = phase1.find_tfl_lights(
             self.curr_container.img)
