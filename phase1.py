@@ -26,8 +26,7 @@ def high_pass_filter_red(img):
 
 def recognize_traffic_light(img):
     neighborhood_size = 75
-    threshold = 0.18
-
+    threshold = 0.21
     data_max = filters.maximum_filter(img, neighborhood_size)
     maxima = (img == data_max)
     data_min = filters.minimum_filter(img, neighborhood_size)
@@ -92,7 +91,7 @@ def print_picture(path_img):
     for x, y in cord:
         red_val = picture2[y, x, 0]
         green_val = picture2[y, x, 1]
-        if red_val >= green_val:
+        if red_val - green_val >= -50:
             plt.plot(x, y, 'r+')
         else:
             plt.plot(x, y, 'g+')
@@ -125,7 +124,6 @@ def test_find_tfl_lights(path_img):
     highpass_filter_red = high_pass_filter_red(picture)
     x_green, y_green = recognize_traffic_light(highpass_filter_green)
     x_red, y_red = recognize_traffic_light(highpass_filter_red)
-    picture2 = np.array(Image.open(path_img))
 
     x_red_, y_red_ = [], []
     for i in range(len(x_red)):

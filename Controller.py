@@ -22,7 +22,7 @@ class Controller:
     def run_managers(self):
         for i, frame_path in enumerate(self.frames_list):
             frame_img = np.asarray(Image.open(frame_path))
-            self.tfl_man.run(i, frame_img)  # send the farne and not phath
+            self.tfl_man.run(i, frame_img)
 
 
 if __name__ == '__main__':

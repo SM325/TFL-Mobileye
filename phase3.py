@@ -33,7 +33,7 @@ def calc_3D_data(norm_prev_pts, norm_curr_pts, R, foe, tZ):
             Z = calc_dist(p_curr, corresponding_p_rot, foe, tZ)
         else:
             Z = 0
-        valid = (Z > 0)
+        valid = (Z > 5 and Z < 90)
         if not valid:
             Z = 0
         validVec.append(valid)
